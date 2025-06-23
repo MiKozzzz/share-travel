@@ -20,5 +20,5 @@ class PodrozInput(BaseModel):
 async def wybierz_podroz(data: PodrozInput):
     print(f"Wybrano podróż: {data.id_podrozy}")
     osoba = TripPlanner().Szukanie_Najlepszej_trasy(data.id_podrozy)
-    return {"status": f"{osoba}"}
+    return osoba
 

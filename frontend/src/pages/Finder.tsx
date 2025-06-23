@@ -8,6 +8,7 @@ export default function Finder() {
   const [podroze, setPodroze] = useState<Podroz[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [odpowiedzBackendu, setOdpowiedzBackendu] = useState<any[]>([]);
 
   useEffect(() => {
     async function loadUserAndPodroze() {
@@ -72,7 +73,10 @@ export default function Finder() {
                     body: JSON.stringify({ id_podrozy: selectedId }),
                   })
                     .then(res => res.json())
-                    .then(data => console.log("Odpowiedź backendu:", data[0]))
+                    .then(data => {
+                      console.log("Odpowiedź backendu:", data);
+                      setOdpowiedzBackendu(data); // <-- zapisz dane do stanu                   
+                    })
                     .catch(err => console.error("Błąd fetch:", err));
                 } else {
                   alert("Wybierz podróż przed kontynuacją.");
@@ -82,6 +86,19 @@ export default function Finder() {
             >
               Szukaj pasażerów
             </button>
+            {odpowiedzBackendu.length > 0 && (
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold mb-2">Znalezieni pasażerowie:</h3>
+                <ul className="space-y-1">
+                  {odpowiedzBackendu.slice(0, 3).map((osoba, index) => (
+                    <li key={index} className="bg-white p-2 rounded shadow">
+                      {/* Dostosuj do struktury danych z backendu */}
+                      <strong>{osoba.imie}</strong> — {osoba.punkt_startowy} → {osoba.punkt_docelowy}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
       </main>

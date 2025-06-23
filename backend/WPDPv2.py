@@ -295,7 +295,7 @@ class TripPlanner:
         self.Rysowanie_mapy(posortowana_niespoznionych[0][1][0], ts)
         self.cur.close()
         self.conn.close()
-        return posortowana_niespoznionych[0]
+        return posortowana_niespoznionych[0:3]
 
 
 if __name__ == "__main__":

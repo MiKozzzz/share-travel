@@ -8,6 +8,7 @@ from openrouteservice.exceptions import ApiError
 import itertools
 from collections import defaultdict
 import psycopg2
+import folium
 def time_to_decimal(time_str):
     """Konwertuje czas w formacie 'HH:MM' na liczbę dziesiętną."""
     hours, minutes = map(int, time_str.split(":"))
@@ -49,8 +50,8 @@ def valid_permutations(events):
 def Liczenie_dlugosci_tras(trasa_slownik, pasazerowie):
     """Funkcja licząca i sortująca długość tras z kandydatami do wspólnej jazdy"""
     # Do testowania, żeby nienadłużywać openrouteservice. Sprawdza tylko jedną permutacje
-    # permutacje = valid_permutations(pasazerowie)[3:4]
-    permutacje = valid_permutations(pasazerowie)
+    permutacje = valid_permutations(pasazerowie)[3:4]
+    # permutacje = valid_permutations(pasazerowie)
     Dlugosci = []
     for perm in permutacje:
         trasa = ("D_start",) + perm + ("D_end",)
@@ -73,6 +74,61 @@ def Liczenie_dlugosci_tras(trasa_slownik, pasazerowie):
                          lista_czasow_trasy_przystankow))
     return Dlugosci
 
+
+def Rysowanie_mapy(trasa, trasa_slownik, cur):
+    """Funkcja rysująca mapę"""
+    trasa_z_wartosciami = tuple(trasa_slownik[klucz] for klucz in trasa)
+    route = client.directions(
+        coordinates=trasa_z_wartosciami,
+        profile='driving-car',
+        format='geojson'
+    )
+    start_coords = trasa_z_wartosciami[0][::-1]  # [lat, lon]
+    m = folium.Map(location=start_coords, zoom_start=13)
+    # Dodaj trasę jako GeoJson
+    folium.GeoJson(route).add_to(m)
+    # Dodaj markery (opcjonalnie)
+    tekst_markera = f'Poczatek'
+    folium.Marker(location=trasa_z_wartosciami[0][::-1], tooltip=tekst_markera).add_to(m)
+    poprzednia = trasa_z_wartosciami[0][::-1]
+    for i in range(len(trasa_z_wartosciami) - 2):
+        tekst = trasa[i+1]
+        id, typ = tekst.split("_")
+        query = """
+            SELECT full_name
+            FROM konto_szczegoly
+            WHERE id_uzytkownika = %s;
+        """
+        # Wykonanie zapytania
+        cur.execute(query, (id,))
+        imie_pasazera = cur.fetchone()[0]
+        if poprzednia == trasa_z_wartosciami[i + 1][::-1]:
+            if typ == "pickup":
+                tekst_markera = tekst_markera + f', {imie_pasazera} wsiada'
+                folium.Marker(location=trasa_z_wartosciami[i + 1][::-1],
+                              tooltip=tekst_markera).add_to(m)
+            if typ == "dropoff":
+                tekst_markera = tekst_markera + f', {imie_pasazera} wysiada'
+                folium.Marker(location=trasa_z_wartosciami[i + 1][::-1],
+                              tooltip=tekst_markera).add_to(m)
+        else:
+            if typ == "pickup":
+                tekst_markera = f'Przystanek: {imie_pasazera} wsiada'
+                folium.Marker(location=trasa_z_wartosciami[i + 1][::-1],
+                              tooltip=tekst_markera).add_to(m)
+            if typ == "dropoff":
+                tekst_markera = f'Przystanek: {imie_pasazera} wysiada'
+                folium.Marker(location=trasa_z_wartosciami[i + 1][::-1],
+                              tooltip=tekst_markera).add_to(m)
+        poprzednia = trasa_z_wartosciami[i+1][::-1]
+
+    if poprzednia == trasa_z_wartosciami[-1][::-1]:
+        tekst_markera = tekst_markera + f', Koniec'
+        folium.Marker(location=trasa_z_wartosciami[-1][::-1], tooltip=tekst_markera).add_to(m)
+    else:
+        folium.Marker(location=trasa_z_wartosciami[-1][::-1], tooltip='Koniec').add_to(m)
+    # Zapisz do pliku HTML
+    m.save("trasa.html")
 
 def Szykowanie(cur, id_przejazdu):
     """Funkcja pobierająca dane z sql do szukania kandydatów dla kierowcy do wspólnej jazdy"""
@@ -214,13 +270,25 @@ def Szukanie_Najlepszej_trasy(id_przejazdu):
 
     posortowana_spoznionych = sorted(lista_spoznionych, key=lambda x: x[1][1])
     posortowana_niespoznionych = sorted(lista_niespoznionych, key=lambda x: x[1][1])
-    print("Niespoznione:")
-    print(posortowana_niespoznionych[0])
-    print(posortowana_niespoznionych[1])
-    print(posortowana_niespoznionych[2])
-    print("Spoznione:")
-    print(posortowana_spoznionych[0])
+    if posortowana_niespoznionych:
+        print("Niespoznione:")
+        print(posortowana_niespoznionych[0])
+        print(posortowana_niespoznionych[1])
+        print(posortowana_niespoznionych[2])
+    if posortowana_spoznionych:
+        print("Spoznione:")
+        print(posortowana_spoznionych[0])
     # Zamknięcie połączenia
+    query = """
+            SELECT full_name
+            FROM konto_szczegoly
+            WHERE id_uzytkownika = %s;
+        """
+    # Wykonanie zapytania
+    cur.execute(query, (posortowana_niespoznionych[0][0],))
+    # Pobranie wyników
+    print(cur.fetchone())
+    Rysowanie_mapy(posortowana_niespoznionych[0][1][0], ts, cur)
     cur.close()
     conn.close()
 

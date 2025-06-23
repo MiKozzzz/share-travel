@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { Minus, Plus } from "lucide-react";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -20,6 +21,9 @@ const Offer: React.FC = () => {
         data: { user },
         error,
       } = await supabase.auth.getUser();
+      if (error) {
+        console.error(error);
+      }
 
       if (user) {
         setUserId(user.id); // UUID użytkownika
@@ -43,7 +47,7 @@ const Offer: React.FC = () => {
         skad,
         dokad,
         d_o_ktorej_najpozniej,
-        s_o_ktorej_najwczesniej,
+        d_o_ktorej_najwczesniej,
         user_id: userId,  // zakładam, że masz kolumnę user_id w tabeli
       },
     ]);
@@ -56,7 +60,7 @@ const Offer: React.FC = () => {
       setSkad("");
       setDokad("");
       setD_o_ktorej_najpozniej("");
-      setS_o_ktorej_najwczesniej("");
+      setD_o_ktorej_najwczesniej("");
     }
   };
 

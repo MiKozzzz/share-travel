@@ -92,7 +92,7 @@ export default function Finder() {
                 <ul className="space-y-2">
                   {odpowiedzBackendu.slice(0, 3).map((element, index) => {
                     const [pasazerId, details, ] = element;
-                    const [trasa, km_trasy, czas_trasy, , , ] = details; // lub po nazwie
+                    const [ , km_trasy, czas_trasy, , , ] = details; // lub po nazwie
                     // const nazwaPierwszegoPrzystanku = trasa?.[0] || "–";
                     // const nazwaOstatniegoPrzystanku = trasa?.[trasa.length - 1] || "–";
                     return (

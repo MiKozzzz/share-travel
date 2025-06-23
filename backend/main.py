@@ -5,11 +5,6 @@ from WPDPv2 import *
 
 app = FastAPI()
 
-origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -24,6 +19,6 @@ class PodrozInput(BaseModel):
 @app.post("/wybierz-podroz")
 async def wybierz_podroz(data: PodrozInput):
     print(f"Wybrano podróż: {data.id_podrozy}")
-    Szukanie_Najlepszej_trasy()
-    return {"status": "ok"}
+    osoba = TripPlanner().Szukanie_Najlepszej_trasy(data.id_podrozy)
+    return {"status": f"{osoba}"}
 

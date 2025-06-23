@@ -72,7 +72,7 @@ export default function Finder() {
                     body: JSON.stringify({ id_podrozy: selectedId }),
                   })
                     .then(res => res.json())
-                    .then(data => console.log("Odpowiedź backendu:", data))
+                    .then(data => console.log("Odpowiedź backendu:", data[0]))
                     .catch(err => console.error("Błąd fetch:", err));
                 } else {
                   alert("Wybierz podróż przed kontynuacją.");

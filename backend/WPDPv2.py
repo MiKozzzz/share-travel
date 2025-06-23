@@ -234,8 +234,15 @@ class TripPlanner:
         return czy_kazdy_zdazyl
 
 
-    def Szukanie_Najlepszej_trasy(self, id_przejazdu):
+    def Szukanie_Najlepszej_trasy(self, id_podroz):
         """Funkcja znajdywania najlepszych kandydatow do trasy dla kierowcy"""
+        query = """
+                    SELECT id_przejazdu
+                    FROM zaplanowane_podroze
+                    WHERE id_podrozy = %s;
+                """
+        self.cur.execute(query, (id_podroz,))
+        id_przejazdu = self.cur.fetchone()[0]
         ts, lp, lista_pasazerow = self.Szykowanie(id_przejazdu)
         # Lista id_uzytkownikow ktorzy nie maja jeszcze przejazdu lub szukaja (*flaga w sql)
         query = """
@@ -268,12 +275,12 @@ class TripPlanner:
         posortowana_niespoznionych = sorted(lista_niespoznionych, key=lambda x: x[1][1])
         if posortowana_niespoznionych:
             print("Niespoznione:")
-            print(posortowana_niespoznionych[0])
-            print(posortowana_niespoznionych[1])
-            print(posortowana_niespoznionych[2])
+            # print(posortowana_niespoznionych[0])
+            # print(posortowana_niespoznionych[1])
+            # print(posortowana_niespoznionych[2])
         if posortowana_spoznionych:
             print("Spoznione:")
-            print(posortowana_spoznionych[0])
+            # print(posortowana_spoznionych[0])
         # Zamknięcie połączenia
         query = """
                 SELECT full_name
@@ -283,14 +290,15 @@ class TripPlanner:
         # Wykonanie zapytania
         self.cur.execute(query, (posortowana_niespoznionych[0][0],))
         # Pobranie wyników
-        print(self.cur.fetchone())
+        osoba = self.cur.fetchone()
+        print(osoba)
         self.Rysowanie_mapy(posortowana_niespoznionych[0][1][0], ts)
         self.cur.close()
         self.conn.close()
+        return posortowana_niespoznionych[0]
 
 
 if __name__ == "__main__":
-    client = openrouteservice.Client(key='5b3ce3597851110001cf624844376cc89897404181958bd72c55e233')
-    id_przejazdu = 'f059fc62-3915-4d6f-bc9f-0e59ca2744a6'
-    TripPlanner().Szukanie_Najlepszej_trasy(id_przejazdu)
+    id_podrozy = '51e4b875-f90c-4633-a578-5a521b9ec125'
+    TripPlanner().Szukanie_Najlepszej_trasy(id_podrozy)
 

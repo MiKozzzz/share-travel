@@ -48,7 +48,7 @@ const Offer: React.FC = () => {
         dokad,
         d_o_ktorej_najpozniej,
         d_o_ktorej_najwczesniej,
-        user_id: userId,  // zakładam, że masz kolumnę user_id w tabeli
+        id_uzytkownika: userId,  // zakładam, że masz kolumnę user_id w tabeli
       },
     ]);
 

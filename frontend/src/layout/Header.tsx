@@ -38,7 +38,13 @@ const Header: React.FC = () => (
         to="/offer"
         className="text-[#18191f] hover:text-primary transition-colors"
       >
-        Invitations
+        Dodawanie podróży
+      </Link>
+      <Link
+        to="/finder"
+        className="text-[#18191f] hover:text-primary transition-colors"
+      >
+        Szukanie osób do wspólnej jazdy
       </Link>
       <Link
         to="/faq"

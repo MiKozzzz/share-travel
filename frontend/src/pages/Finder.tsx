@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { Plus } from "lucide-react";
-import { supabase } from "../lib/supabase";
 
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL!,
+  import.meta.env.VITE_SUPABASE_ANON_KEY!
+);
 
 const Offer: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
@@ -63,7 +66,7 @@ const Offer: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-primary text-white py-3 px-4 text-center">
-        Następna zaplanowana wspólna podróż: dzisiaj, 7:30, ul. Sienkiewicza 12!
+        Finder!
       </div>
 
       <main className="container mx-auto px-4 py-8">

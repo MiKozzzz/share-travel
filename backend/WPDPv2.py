@@ -1,10 +1,5 @@
-from itertools import combinations, permutations
-from math import dist
-import sys
 import openrouteservice
-from openrouteservice import convert
 import numpy as np
-from openrouteservice.exceptions import ApiError
 import itertools
 from collections import defaultdict
 import psycopg2

@@ -1,37 +1,30 @@
 import { useEffect, useState } from "react";
-import { supabaseClient } from "../lib/supabase";
+import type { Podroz } from "../lib/podroze";
+import { fetchPodroze } from "../lib/podroze";
+import { getCurrentUserId } from "../lib/auth";
 
-type Podroz = {
-  id_podrozy: string;
-  skad: string;
-  dokad: string;
-  // inne pola według tabeli
-};
-
-export default function PodrozeList({ userId }: { userId: string }) {
+export default function Finder() {
+  const [userId, setUserId] = useState<string | null>(null);
   const [podroze, setPodroze] = useState<Podroz[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchPodroze() {
+    async function loadUserAndPodroze() {
       setLoading(true);
-      const { data, error } = await supabaseClient
-        .from("zaplanowane_podroze")
-        .select("*")
-        .eq("id_uzytkownika", userId);
-
-      if (error) {
-        console.error("Błąd pobierania:", error);
-      } else {
-        setPodroze(data || []);
+      const uid = await getCurrentUserId();
+      if (uid) {
+        setUserId(uid);
+        const dane = await fetchPodroze(uid);
+        setPodroze(dane);
       }
       setLoading(false);
     }
 
-    fetchPodroze();
-  }, [userId]);
+    loadUserAndPodroze();
+  }, []);
 
   if (loading) return <div>Ładowanie danych...</div>;
+  if (!userId) return <div>Nie jesteś zalogowany.</div>;
   if (podroze.length === 0) return <div>Brak zaplanowanych podróży.</div>;
 
   return (
@@ -53,7 +46,6 @@ export default function PodrozeList({ userId }: { userId: string }) {
               </li>
             ))}
           </ul>
-          {/* Przycisk szukania */}
           <div className="mt-8 text-center">
             <button
               onClick={() => {}}
@@ -66,4 +58,4 @@ export default function PodrozeList({ userId }: { userId: string }) {
       </main>
     </div>
   );
-};
+}

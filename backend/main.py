@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from WPDPv2 import *
 
 app = FastAPI()
 
@@ -23,5 +24,6 @@ class PodrozInput(BaseModel):
 @app.post("/wybierz-podroz")
 async def wybierz_podroz(data: PodrozInput):
     print(f"Wybrano podróż: {data.id_podrozy}")
+    Szukanie_Najlepszej_trasy()
     return {"status": "ok"}
 

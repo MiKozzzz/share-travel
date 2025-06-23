@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
 import { Plus } from "lucide-react";
 import { supabaseClient } from "../lib/supabase";
 

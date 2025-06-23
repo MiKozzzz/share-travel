@@ -9,11 +9,10 @@ const supabase = createClient(
 
 const Offer: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
-
   const [skad, setSkad] = useState("");
   const [dokad, setDokad] = useState("");
   const [d_o_ktorej_najpozniej, setD_o_ktorej_najpozniej] = useState("");
-  const [d_o_ktorej_najwczesniej, setD_o_ktorej_najwczesniej] = useState("");
+  const [s_o_ktorej_najwczesniej, setS_o_ktorej_najwczesniej] = useState("");
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -47,7 +46,7 @@ const Offer: React.FC = () => {
         skad,
         dokad,
         d_o_ktorej_najpozniej,
-        d_o_ktorej_najwczesniej,
+        s_o_ktorej_najwczesniej,
         id_uzytkownika: userId,  // zakładam, że masz kolumnę user_id w tabeli
       },
     ]);
@@ -60,7 +59,7 @@ const Offer: React.FC = () => {
       setSkad("");
       setDokad("");
       setD_o_ktorej_najpozniej("");
-      setD_o_ktorej_najwczesniej("");
+      setS_o_ktorej_najwczesniej("");
     }
   };
 
@@ -140,13 +139,13 @@ const Offer: React.FC = () => {
             {/* d_o_ktorej_najpozniej */}
             <div className="bg-white p-6 rounded-md flex flex-col items-center">
               <button className="bg-primary text-white py-3 px-6 rounded-md w-full mb-6 hover:bg-[#3d9c3f]">
-                Podaj D_o_ktorej_najwczesniej
+                Podaj S_o_ktorej_najwczesniej
               </button>
               <div className="flex items-center w-full border border-gray-300 rounded-md overflow-hidden">
                 <input
                   type="text"
-                  value={d_o_ktorej_najwczesniej}
-                  onChange={(e) => setD_o_ktorej_najwczesniej(e.target.value)}
+                  value={s_o_ktorej_najwczesniej}
+                  onChange={(e) => setS_o_ktorej_najwczesniej(e.target.value)}
                   placeholder="np. 7:00"
                   className="w-full border border-gray-300 rounded-md py-2 px-4 pl-10"
                 />

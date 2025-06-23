@@ -88,14 +88,22 @@ export default function Finder() {
             </button>
             {odpowiedzBackendu.length > 0 && (
               <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-2">Znalezieni pasażerowie:</h3>
-                <ul className="space-y-1">
-                  {odpowiedzBackendu.slice(0, 3).map((osoba, index) => (
-                    <li key={index} className="bg-white p-2 rounded shadow">
-                      {/* Dostosuj do struktury danych z backendu */}
-                      <strong>{osoba.imie}</strong> — {osoba.punkt_startowy} → {osoba.punkt_docelowy}
-                    </li>
-                  ))}
+                <h3 className="text-lg font-semibold mb-2">Najlepsi pasażerowie:</h3>
+                <ul className="space-y-2">
+                  {odpowiedzBackendu.slice(0, 3).map((element, index) => {
+                    const [podrozId, details, metrics] = element;
+                    const [trasa, , , , , ] = details; // lub po nazwie
+                    const nazwaPierwszegoPrzystanku = trasa?.[0] || "–";
+                    const nazwaOstatniegoPrzystanku = trasa?.[trasa.length - 1] || "–";
+
+                    return (
+                      <li key={index} className="bg-white rounded shadow p-4">
+                        <p><strong>Podróż ID:</strong> {podrozId}</p>
+                        <p><strong>Od:</strong> {nazwaPierwszegoPrzystanku}</p>
+                        <p><strong>Do:</strong> {nazwaOstatniegoPrzystanku}</p>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             )}

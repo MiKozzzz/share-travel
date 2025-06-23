@@ -91,17 +91,15 @@ export default function Finder() {
                 <h3 className="text-lg font-semibold mb-2">Najlepsi pasażerowie:</h3>
                 <ul className="space-y-2">
                   {odpowiedzBackendu.slice(0, 3).map((element, index) => {
-                    const [podrozId, details, metrics] = element;
-                    const [trasa, , , , , ] = details; // lub po nazwie
-                    const nazwaPierwszegoPrzystanku = trasa?.[0] || "–";
-                    const nazwaOstatniegoPrzystanku = trasa?.[trasa.length - 1] || "–";
-
+                    const [pasazerId, details, ] = element;
+                    const [trasa, km_trasy, czas_trasy, , , ] = details; // lub po nazwie
+                    // const nazwaPierwszegoPrzystanku = trasa?.[0] || "–";
+                    // const nazwaOstatniegoPrzystanku = trasa?.[trasa.length - 1] || "–";
                     return (
                       <li key={index} className="bg-white rounded shadow p-4">
-                        <p><strong>Podróż ID:</strong> {podrozId}</p>
-                        <p><strong>Od:</strong> {nazwaPierwszegoPrzystanku}</p>
-                        <p><strong>Do:</strong> {nazwaOstatniegoPrzystanku}</p>
-                        <p><strong>Czas podróży:</strong> {metrics?.[`${podrozId}_travel_time`]?.toFixed(2)} min</p>
+                        <p><strong>Pasażer:</strong> {pasazerId}</p>
+                        <p><strong>Długość trasy:</strong> {km_trasy}</p>
+                        <p><strong>Czas trasy:</strong> {czas_trasy}</p>
                       </li>
                     );
                   })}

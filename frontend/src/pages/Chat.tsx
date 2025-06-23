@@ -9,7 +9,7 @@ const Chat: React.FC = () => {
             <div className="h-2 w-4 border-l-2 border-r-2 border-b-2 border-white rotate-180"></div>
           </div>
         </div>
-        Następna zaplanowana wspólna podróż: dzisiaj, 8:30, ul. Sienkiewicza 12!
+        Następna zaplanowana wspólna podróż: dzisiaj, 7:30, ul. Sienkiewicza 12!
       </div>
 
       <div className="flex-1 flex">

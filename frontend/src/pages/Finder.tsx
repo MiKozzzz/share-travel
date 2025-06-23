@@ -12,7 +12,6 @@ export default function Finder() {
     async function loadUserAndPodroze() {
       setLoading(true);
       const uid = await getCurrentUserId();
-      console.log("userId:", uid); // <-- TUTAJ wyświetlisz wartość
       if (uid) {
         setUserId(uid);
         const dane = await fetchPodroze(uid);

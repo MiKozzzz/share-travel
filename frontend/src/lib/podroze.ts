@@ -11,13 +11,11 @@ export async function fetchPodroze(userId: string): Promise<Podroz[]> {
   const { data, error } = await supabaseClient
     .from("zaplanowane_podroze")
     .select("*")
-    // .eq("id_uzytkownika", userId);
+    .eq("id_uzytkownika", userId);
 
   if (error) {
     console.error("Błąd pobierania podróży:", error);
     return [];
   }
-  console.log("data:", data);
-  console.log("userId:", userId); // <-- TUTAJ wyświetlisz wartość
   return data || [];
 }

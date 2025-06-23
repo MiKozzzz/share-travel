@@ -1,66 +1,38 @@
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { supabaseClient } from "../lib/supabase";
 
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL!,
-  import.meta.env.VITE_SUPABASE_ANON_KEY!
-);
+type Podroz = {
+  id: number;
+  skad: string;
+  dokad: string;
+  // inne pola według tabeli
+};
 
-const Offer: React.FC = () => {
-  const [userId, setUserId] = useState<string | null>(null);
-  const [skad, setSkad] = useState("");
-  const [dokad, setDokad] = useState("");
-  const [d_o_ktorej_najpozniej, setD_o_ktorej_najpozniej] = useState("");
-  const [s_o_ktorej_najwczesniej, setS_o_ktorej_najwczesniej] = useState("");
+export default function PodrozeList({ userId }: { userId: string }) {
+  const [podroze, setPodroze] = useState<Podroz[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser();
+    async function fetchPodroze() {
+      setLoading(true);
+      const { data, error } = await supabaseClient
+        .from("zaplanowane_podroze")
+        .select("*")
+        .eq("id_uzytkownika", userId);
+
       if (error) {
-        console.error(error);
-      }
-
-      if (user) {
-        setUserId(user.id); // UUID użytkownika
+        console.error("Błąd pobierania:", error);
       } else {
-        setUserId(null);
+        setPodroze(data || []);
       }
-    };
-
-    fetchUser();
-  }, []);
-
-  // teraz userId możesz użyć w handleSubmit do zapisu
-  const handleSubmit = async () => {
-    if (!userId) {
-      alert("Musisz być zalogowany!");
-      return;
+      setLoading(false);
     }
 
-    const { error } = await supabase.from("zaplanowane_podroze").insert([
-      {
-        skad,
-        dokad,
-        d_o_ktorej_najpozniej,
-        s_o_ktorej_najwczesniej,
-        id_uzytkownika: userId,  // zakładam, że masz kolumnę user_id w tabeli
-      },
-    ]);
+    fetchPodroze();
+  }, [userId]);
 
-    if (error) {
-      alert("Błąd zapisu: " + error.message);
-    } else {
-      alert("Podróż została zapisana!");
-      // wyczyść formularz
-      setSkad("");
-      setDokad("");
-      setD_o_ktorej_najpozniej("");
-      setS_o_ktorej_najwczesniej("");
-    }
-  };
+  if (loading) return <div>Ładowanie danych...</div>;
+  if (podroze.length === 0) return <div>Brak zaplanowanych podróży.</div>;
 
   return (
     <div className="min-h-screen bg-white">
@@ -71,15 +43,23 @@ const Offer: React.FC = () => {
       <main className="container mx-auto px-4 py-8">
         <div className="bg-[#d9d9d9] p-8 rounded-md min-h-[80vh]">
           <h1 className="text-2xl font-semibold text-center mb-8 text-[#212121]">
-            Dodawanie nowej podróży
+            Wybierz podróż
           </h1>
-          {/* Przycisk zapisu */}
+          <h2>Twoje podróże:</h2>
+          <ul>
+            {podroze.map((p) => (
+              <li key={p.id}>
+                Z: {p.skad} do {p.dokad}
+              </li>
+            ))}
+          </ul>
+          {/* Przycisk szukania */}
           <div className="mt-8 text-center">
             <button
-              onClick={handleSubmit}
+              onClick={() => {}}
               className="bg-green-600 text-white py-3 px-8 rounded-lg hover:bg-green-700"
             >
-              Zapisz podróż
+              Szukaj pasażerów
             </button>
           </div>
         </div>
@@ -87,5 +67,3 @@ const Offer: React.FC = () => {
     </div>
   );
 };
-
-export default Offer;

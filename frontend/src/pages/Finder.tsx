@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabaseClient } from "../lib/supabase";
 
 type Podroz = {
-  id: number;
+  id: string;
   skad: string;
   dokad: string;
   // inne pola według tabeli

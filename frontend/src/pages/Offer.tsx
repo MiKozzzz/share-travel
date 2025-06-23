@@ -67,6 +67,7 @@ const Offer: React.FC = () => {
 
       <main className="container mx-auto px-4 py-8">
         <div className="bg-[#d9d9d9] p-8 rounded-md min-h-[80vh]">
+
           <h1 className="text-2xl font-semibold text-center mb-8 text-[#212121]">
             Dodawanie nowej podróży
           </h1>

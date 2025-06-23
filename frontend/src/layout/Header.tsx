@@ -32,7 +32,7 @@ const Header: React.FC = () => (
         to="/chat"
         className="text-[#18191f] hover:text-primary transition-colors"
       >
-        Friends
+        Znajomi
       </Link>
       <Link
         to="/offer"

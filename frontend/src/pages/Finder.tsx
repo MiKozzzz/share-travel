@@ -7,6 +7,7 @@ export default function Finder() {
   const [userId, setUserId] = useState<string | null>(null);
   const [podroze, setPodroze] = useState<Podroz[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadUserAndPodroze() {
@@ -38,17 +39,34 @@ export default function Finder() {
           <h1 className="text-2xl font-semibold text-center mb-8 text-[#212121]">
             Wybierz podróż
           </h1>
-          <h2>Twoje podróże:</h2>
-          <ul>
+          <h2 className="mb-4 text-lg font-medium">Twoje podróże:</h2>
+          <ul className="space-y-2">
             {podroze.map((p) => (
-              <li key={p.id_podrozy}>
-                Z: {p.skad} do {p.dokad}
+              <li
+                key={p.id_podrozy}
+                className={`p-4 rounded-lg cursor-pointer border ${
+                  selectedId === p.id_podrozy
+                    ? "bg-green-200 border-green-500"
+                    : "bg-white border-gray-300"
+                }`}
+                onClick={() => setSelectedId(p.id_podrozy)}
+              >
+                <strong>Z:</strong> {p.skad} <strong>do</strong> {p.dokad}
               </li>
             ))}
           </ul>
+
+          {/* Przycisk szukania */}
           <div className="mt-8 text-center">
             <button
-              onClick={() => {}}
+              onClick={() => {
+                if (selectedId) {
+                  const wybrana = podroze.find((p) => p.id_podrozy === selectedId);
+                  alert(`Wybrano podróż: ${wybrana?.skad} → ${wybrana?.dokad}`);
+                } else {
+                  alert("Wybierz podróż przed kontynuacją.");
+                }
+              }}
               className="bg-green-600 text-white py-3 px-8 rounded-lg hover:bg-green-700"
             >
               Szukaj pasażerów

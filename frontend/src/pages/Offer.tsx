@@ -9,6 +9,11 @@ const supabase = createClient(
 const Offer: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
 
+  const [skad, setSkad] = useState("");
+  const [dokad, setDokad] = useState("");
+  const [d_o_ktorej_najpozniej, setD_o_ktorej_najpozniej] = useState("");
+  const [d_o_ktorej_najwczesniej, setD_o_ktorej_najwczesniej] = useState("");
+
   useEffect(() => {
     const fetchUser = async () => {
       const {
@@ -147,6 +152,7 @@ const Offer: React.FC = () => {
                 />
               </div>
             </div>
+          </div>
 
           {/* Przycisk zapisu */}
           <div className="mt-8 text-center">

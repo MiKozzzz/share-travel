@@ -101,6 +101,7 @@ export default function Finder() {
                         <p><strong>Podróż ID:</strong> {podrozId}</p>
                         <p><strong>Od:</strong> {nazwaPierwszegoPrzystanku}</p>
                         <p><strong>Do:</strong> {nazwaOstatniegoPrzystanku}</p>
+                        <p><strong>Czas podróży:</strong> {metrics?.[`${podrozId}_travel_time`]?.toFixed(2)} min</p>
                       </li>
                     );
                   })}

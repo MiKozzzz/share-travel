@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabaseClient } from "../lib/supabase";
 
 type Podroz = {
-  id: string;
+  id_podrozy: string;
   skad: string;
   dokad: string;
   // inne pola według tabeli
@@ -48,7 +48,7 @@ export default function PodrozeList({ userId }: { userId: string }) {
           <h2>Twoje podróże:</h2>
           <ul>
             {podroze.map((p) => (
-              <li key={p.id}>
+              <li key={p.id_podrozy}>
                 Z: {p.skad} do {p.dokad}
               </li>
             ))}

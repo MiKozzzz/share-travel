@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { Plus } from "lucide-react";
-import { supabase } from "../lib/supabase";
+import { supabaseClient } from "../lib/supabase";
 
 
 const Offer: React.FC = () => {
@@ -16,7 +16,7 @@ const Offer: React.FC = () => {
       const {
         data: { user },
         error,
-      } = await supabase.auth.getUser();
+      } = await supabaseClient.auth.getUser();
       if (error) {
         console.error(error);
       }
@@ -38,7 +38,7 @@ const Offer: React.FC = () => {
       return;
     }
 
-    const { error } = await supabase.from("zaplanowane_podroze").insert([
+    const { error } = await supabaseClient.from("zaplanowane_podroze").insert([
       {
         skad,
         dokad,

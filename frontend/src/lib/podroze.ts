@@ -17,6 +17,7 @@ export async function fetchPodroze(userId: string): Promise<Podroz[]> {
     console.error("Błąd pobierania podróży:", error);
     return [];
   }
+  console.log("data:", data);
   console.log("userId:", userId); // <-- TUTAJ wyświetlisz wartość
   return data || [];
 }

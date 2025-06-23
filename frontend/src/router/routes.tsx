@@ -8,6 +8,8 @@ const SignInPage = lazy(() => import("../pages/SignInPage"));
 const Chat = lazy(() => import("../pages/Chat"));
 const Offer = lazy(() => import("../pages/Offer"));
 const Planner = lazy(() => import("../pages/Planner"));
+const Finder = lazy(() => import("../pages/Finder"));
+
 
 const routes = [
   {
@@ -20,6 +22,7 @@ const routes = [
       { path: "/chat", element: <Chat /> },
       { path: "/offer", element: <Offer /> },
       { path: "/planner", element: <Planner /> },
+      { path: "/offer", element: <Finder /> },
     ],
   },
 

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { Plus } from "lucide-react";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL!,
@@ -74,89 +73,6 @@ const Offer: React.FC = () => {
           <h1 className="text-2xl font-semibold text-center mb-8 text-[#212121]">
             Dodawanie nowej podróży
           </h1>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {/* Skad */}
-            <div className="bg-white p-6 rounded-md flex flex-col items-center">
-              <button className="bg-primary text-white py-3 px-6 rounded-md w-full mb-6 hover:bg-[#3d9c3f]">
-                Podaj skad
-              </button>
-              <div className="relative w-full">
-                <input
-                  type="text"
-                  value={skad}
-                  onChange={(e) => setSkad(e.target.value)}
-                  placeholder="np. ul. Rozpoczęcia"
-                  className="w-full border border-gray-300 rounded-md py-2 px-4 pl-10"
-                />
-                <Plus
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary"
-                  size={20}
-                />
-              </div>
-            </div>
-
-            {/* Dokad */}
-            <div className="bg-white p-6 rounded-md flex flex-col items-center">
-              <button className="bg-primary text-white py-3 px-6 rounded-md w-full mb-6 hover:bg-[#3d9c3f]">
-                Podaj dokad
-              </button>
-              <div className="relative w-full">
-                <input
-                  type="text"
-                  value={dokad}
-                  onChange={(e) => setDokad(e.target.value)}
-                  placeholder="np. ul. Docelowa"
-                  className="w-full border border-gray-300 rounded-md py-2 px-4 pl-10"
-                />
-                <Plus
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary"
-                  size={20}
-                />
-              </div>
-            </div>
-
-            {/* d_o_ktorej_najpozniej */}
-            <div className="bg-white p-6 rounded-md flex flex-col items-center">
-              <button className="bg-primary text-white py-3 px-6 rounded-md w-full mb-6 hover:bg-[#3d9c3f]">
-                Podaj d_o_ktorej_najpozniej
-              </button>
-              <div className="flex items-center w-full border border-gray-300 rounded-md overflow-hidden">
-                <input
-                  type="text"
-                  value={d_o_ktorej_najpozniej}
-                  onChange={(e) => setD_o_ktorej_najpozniej(e.target.value)}
-                  placeholder="np. 7:00"
-                  className="w-full border border-gray-300 rounded-md py-2 px-4 pl-10"
-                />
-                <Plus
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary"
-                  size={20}
-                />
-              </div>
-            </div>
-
-            {/* d_o_ktorej_najpozniej */}
-            <div className="bg-white p-6 rounded-md flex flex-col items-center">
-              <button className="bg-primary text-white py-3 px-6 rounded-md w-full mb-6 hover:bg-[#3d9c3f]">
-                Podaj S_o_ktorej_najwczesniej
-              </button>
-              <div className="flex items-center w-full border border-gray-300 rounded-md overflow-hidden">
-                <input
-                  type="text"
-                  value={s_o_ktorej_najwczesniej}
-                  onChange={(e) => setS_o_ktorej_najwczesniej(e.target.value)}
-                  placeholder="np. 7:00"
-                  className="w-full border border-gray-300 rounded-md py-2 px-4 pl-10"
-                />
-                <Plus
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary"
-                  size={20}
-                />
-              </div>
-            </div>
-          </div>
-
           {/* Przycisk zapisu */}
           <div className="mt-8 text-center">
             <button

@@ -8,7 +8,7 @@ const Planner: React.FC = () => {
           <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 text-primary text-2xl">
             ▲
           </span>
-          Następna zaplanowana wspólna podróż: dzisiaj, 7:30, ul. Sienkiewicza
+          Następna zaplanowana wspólna podróż: dzisiaj, 7:50, ul. Sienkiewicza
           12!
         </div>
       </div>

@@ -71,8 +71,7 @@ def Liczenie_dlugosci_tras(trasa_slownik, pasazerowie):
             lista_odlegosci_trasy_przystankow.append(round(total_distance, 2))
         Dlugosci.append((trasa, round(total_distance, 2), round(total_duration, 2), lista_odlegosci_trasy_przystankow,
                          lista_czasow_trasy_przystankow))
-    posortowana = sorted(Dlugosci, key=lambda x: x[1])
-    return posortowana
+    return Dlugosci
 
 
 def Szykowanie(cur, id_przejazdu):
@@ -110,7 +109,7 @@ def Szykowanie(cur, id_przejazdu):
     id_pasazerow = cur.fetchall()
     for a in id_pasazerow:
         lista_pasazerow.append(a[0])
-    pasazerowie_pickdrop = ("cand_pickup", "cand_dropoff")
+    pasazerowie_pickdrop = ()
     for p in lista_pasazerow:
         query = """
             SELECT *
@@ -126,7 +125,6 @@ def Szykowanie(cur, id_przejazdu):
         trasa_slownik[f"{p}_dropoff"] = geocode_address(dane_pasazera[5])
         trasa_slownik[f"{p}_arrival_time"] = time_to_decimal(dane_pasazera[7])
         pasazerowie_pickdrop = pasazerowie_pickdrop + (f"{p}_pickup", f"{p}_dropoff")
-    lista_pasazerow.append("cand")
     return trasa_slownik, pasazerowie_pickdrop, lista_pasazerow
 
 
@@ -173,8 +171,8 @@ def Szukanie_Najlepszej_trasy(id_przejazdu):
     host = "aws-0-eu-central-1.pooler.supabase.com"
     port = 6543
     database = "postgres"
-    user = "postgres.xnykxakrxdqotervlicf"
-    password = "7%xCRQmn5h&*FPF"  # wpisz tutaj swoje hasło
+    user = "postgres.kxlsznvtipfyhhnilxuj"
+    password = "hY2bEwbOwqDgNHFM"  # wpisz tutaj swoje hasło
     # Połączenie z bazą
     conn = psycopg2.connect(
         host=host,
@@ -198,22 +196,30 @@ def Szukanie_Najlepszej_trasy(id_przejazdu):
     lista_niespoznionych = []
     lista_spoznionych = []
     # Lista id pasazerow, co drugie slowo przed _ z listy lp zapisuje jako pasazera
-    print(lista_pasazerow)
     for k in kandydaci_przejazdu:
-        ts["cand_pickup"] = geocode_address(k[2])
-        ts["cand_dropoff"] = geocode_address(k[5])
-        ts["cand_arrival_time"] = time_to_decimal(k[7])
-        plt = Liczenie_dlugosci_tras(ts, lp)
-        # TUTAJ SPRAWDZAM TYLKO JEDNE PRZYPDAKI plt[0]
+        lista_pazazerow_z_kandydatem = lista_pasazerow.copy()
+        lista_pazazerow_z_kandydatem.append(k[1])
+        ts[f"{k[1]}_pickup"] = geocode_address(k[2])
+        ts[f"{k[1]}_dropoff"] = geocode_address(k[5])
+        ts[f"{k[1]}_arrival_time"] = time_to_decimal(k[7])
+        nowe_lp = lp + (f"{k[1]}_pickup", f"{k[1]}_dropoff")
+        plt = Liczenie_dlugosci_tras(ts, nowe_lp)
         for p in plt:
             slownik_pasazerow_km_h = Sprawdzanie_czasow_i_km(p, ts)
             czy_kazdy_zdazyl = Sprawdzanie_cz_kazdy_zdazyl(lista_pasazerow, ts, slownik_pasazerow_km_h, p[2])
             if czy_kazdy_zdazyl == 1:
-                lista_niespoznionych.append((p, slownik_pasazerow_km_h))
+                lista_niespoznionych.append((k[1], p, slownik_pasazerow_km_h))
             else:
-                lista_spoznionych.append((p, slownik_pasazerow_km_h))
+                lista_spoznionych.append((k[1], p, slownik_pasazerow_km_h))
 
-
+    posortowana_spoznionych = sorted(lista_spoznionych, key=lambda x: x[1][1])
+    posortowana_niespoznionych = sorted(lista_niespoznionych, key=lambda x: x[1][1])
+    print("Niespoznione:")
+    print(posortowana_niespoznionych[0])
+    print(posortowana_niespoznionych[1])
+    print(posortowana_niespoznionych[2])
+    print("Spoznione:")
+    print(posortowana_spoznionych[0])
     # Zamknięcie połączenia
     cur.close()
     conn.close()

@@ -22,7 +22,7 @@ const routes = [
       { path: "/chat", element: <Chat /> },
       { path: "/offer", element: <Offer /> },
       { path: "/planner", element: <Planner /> },
-      { path: "/offer", element: <Finder /> },
+      { path: "/finder", element: <Finder /> },
     ],
   },
 

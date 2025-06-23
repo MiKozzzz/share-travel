@@ -82,7 +82,7 @@ class TripPlanner:
                 total_duration += segment['duration'] / 60
                 lista_czasow_trasy_przystankow.append(round(total_duration, 2))
                 lista_odlegosci_trasy_przystankow.append(round(total_distance, 2))
-            Dlugosci.append((trasa, round(total_distance, 2), round(total_duration, 2), lista_odlegosci_trasy_przystankow,
+            Dlugosci.append((trasa, round(total_distance, 2), round(total_duration), lista_odlegosci_trasy_przystankow,
                              lista_czasow_trasy_przystankow))
         return Dlugosci
 
@@ -140,6 +140,7 @@ class TripPlanner:
         else:
             folium.Marker(location=trasa_z_wartosciami[-1][::-1], tooltip='Koniec').add_to(m)
         # Zapisz do pliku HTML
+        print(m)
         m.save("trasa.html")
 
     def Szykowanie(self, id_przejazdu):
@@ -267,9 +268,9 @@ class TripPlanner:
                 slownik_pasazerow_km_h = self.Sprawdzanie_czasow_i_km(p, ts)
                 czy_kazdy_zdazyl = self.Sprawdzanie_cz_kazdy_zdazyl(lista_pasazerow, ts, slownik_pasazerow_km_h, p[2])
                 if czy_kazdy_zdazyl == 1:
-                    lista_niespoznionych.append((k[1], p, slownik_pasazerow_km_h))
+                    lista_niespoznionych.append([k[1], p, slownik_pasazerow_km_h])
                 else:
-                    lista_spoznionych.append((k[1], p, slownik_pasazerow_km_h))
+                    lista_spoznionych.append([k[1], p, slownik_pasazerow_km_h])
 
         posortowana_spoznionych = sorted(lista_spoznionych, key=lambda x: x[1][1])
         posortowana_niespoznionych = sorted(lista_niespoznionych, key=lambda x: x[1][1])
@@ -281,17 +282,20 @@ class TripPlanner:
         if posortowana_spoznionych:
             print("Spoznione:")
             # print(posortowana_spoznionych[0])
-        # Zamknięcie połączenia
-        query = """
-                SELECT full_name
-                FROM konto_szczegoly
-                WHERE id_uzytkownika = %s;
-            """
-        # Wykonanie zapytania
-        self.cur.execute(query, (posortowana_niespoznionych[0][0],))
-        # Pobranie wyników
-        osoba = self.cur.fetchone()
-        print(osoba)
+
+        for i in posortowana_niespoznionych[0:3]:
+            # Zamknięcie połączenia
+            query = """
+                    SELECT full_name
+                    FROM konto_szczegoly
+                    WHERE id_uzytkownika = %s;
+                """
+            # Wykonanie zapytania
+            self.cur.execute(query, (i[0],))
+            # Pobranie wyników
+            osoba = self.cur.fetchone()[0]
+            i[0] = osoba
+
         self.Rysowanie_mapy(posortowana_niespoznionych[0][1][0], ts)
         self.cur.close()
         self.conn.close()

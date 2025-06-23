@@ -9,6 +9,7 @@ export default function Finder() {
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [odpowiedzBackendu, setOdpowiedzBackendu] = useState<any[]>([]);
+  const [selectedDetailsIndex, setSelectedDetailsIndex] = useState<number | null>(null);
 
   useEffect(() => {
     async function loadUserAndPodroze() {
@@ -86,26 +87,49 @@ export default function Finder() {
             >
               Szukaj pasażerów
             </button>
-            {odpowiedzBackendu.length > 0 && (
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-2">Najlepsi pasażerowie:</h3>
-                <ul className="space-y-2">
-                  {odpowiedzBackendu.slice(0, 3).map((element, index) => {
-                    const [pasazerId, details, ] = element;
-                    const [ , km_trasy, czas_trasy, , , ] = details; // lub po nazwie
-                    // const nazwaPierwszegoPrzystanku = trasa?.[0] || "–";
-                    // const nazwaOstatniegoPrzystanku = trasa?.[trasa.length - 1] || "–";
-                    return (
-                      <li key={index} className="bg-white rounded shadow p-4">
-                        <p><strong>Pasażer:</strong> {pasazerId}</p>
-                        <p><strong>Długość trasy:</strong> {km_trasy}</p>
-                        <p><strong>Czas trasy:</strong> {czas_trasy}</p>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            )}
+            {odpowiedzBackendu.slice(0, 3).map((element, index) => {
+              const [Imie, details, metryki] = element;
+              const [trasa, km_trasy, czas_trasy, distList, czasList] = details;
+
+              return (
+                <li key={index} className="bg-white rounded shadow p-4">
+                  <p><strong>Pasażer:</strong> {Imie}</p>
+                  <p><strong>Długość trasy:</strong> {km_trasy} km</p>
+                  <p><strong>Czas trasy:</strong> {czas_trasy} min</p>
+
+                  <button
+                    className="text-blue-600 underline mt-2"
+                    onClick={() => setSelectedDetailsIndex(index === selectedDetailsIndex ? null : index)}
+                  >
+                    {selectedDetailsIndex === index ? "Ukryj szczegóły" : "Pokaż szczegóły"}
+                  </button>
+
+                  {selectedDetailsIndex === index && (
+                    <div className="mt-4 bg-gray-100 p-4 rounded text-sm">
+                      <h4 className="font-semibold mb-2">Trasa:</h4>
+                      <ul className="list-disc list-inside mb-2">
+                        {trasa.map((punkt: string, i: number) => (
+                          <li key={i}>{punkt}</li>
+                        ))}
+                      </ul>
+
+                      <h4 className="font-semibold mt-4 mb-2">Długości odcinków (km):</h4>
+                      <p>{JSON.stringify(distList)}</p>
+
+                      <h4 className="font-semibold mt-4 mb-2">Czasy odcinków (min):</h4>
+                      <p>{JSON.stringify(czasList)}</p>
+
+                      <h4 className="font-semibold mt-4 mb-2">Metryki:</h4>
+                      <ul className="list-disc list-inside">
+                        {Object.entries(metryki).map(([key, val]) => (
+                          <li key={key}><strong>{key}:</strong> {String(val)}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </li>
+              );
+            })}
           </div>
         </div>
       </main>

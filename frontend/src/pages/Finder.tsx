@@ -63,31 +63,17 @@ export default function Finder() {
                 if (selectedId) {
                   const wybrana = podroze.find((p) => p.id_podrozy === selectedId);
                   alert(`Wybrano podróż: ${wybrana?.skad} → ${wybrana?.dokad}`);
-
-                  // WYŚLIJ selectedId do backendu FastAPI
-                  try {
-                    const response = await fetch("http://127.0.0.1:8000/wybierz-podroz", {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                      body: JSON.stringify({ id_podrozy: selectedId }),
-                    });
-
-                    const result = await response.json();
-
-                    if (response.ok) {
-                      console.log("Odpowiedź backendu:", result);
-                      alert("Wybrana podróż została przesłana do backendu.");
-                    } else {
-                      console.error("Błąd z backendu:", result);
-                      alert("Wystąpił błąd podczas wysyłania danych.");
-                    }
-                  } catch (error) {
-                    console.error("Błąd sieci:", error);
-                    alert("Nie udało się połączyć z backendem.");
-                  }
-
+                  // Tutaj wywołujesz backend:
+                  fetch("http://127.0.0.1:8000/wybierz-podroz", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ id_podrozy: selectedId }),
+                  })
+                    .then(res => res.json())
+                    .then(data => console.log("Odpowiedź backendu:", data))
+                    .catch(err => console.error("Błąd fetch:", err));
                 } else {
                   alert("Wybierz podróż przed kontynuacją.");
                 }

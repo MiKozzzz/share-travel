@@ -4,18 +4,25 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-# CORS - jeśli frontend działa np. na localhost:3000
+# Tutaj konfigurujesz CORS:
+origins = [
+    "http://localhost:3000",  # adres Twojego frontendowego serwera React
+    "http://127.0.0.1:3000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=origins,      # dozwolone adresy frontendów
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],        # zezwól na wszystkie metody (GET, POST itd.)
+    allow_headers=["*"],        # zezwól na wszystkie nagłówki
 )
 
+# Model wejściowy
 class PodrozInput(BaseModel):
     id_podrozy: str
 
+# Endpoint
 @app.post("/wybierz-podroz")
 async def wybierz_podroz(data: PodrozInput):
     print(f"Wybrano podróż: {data.id_podrozy}")

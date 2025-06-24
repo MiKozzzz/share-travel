@@ -257,6 +257,7 @@ class TripPlanner:
         self.cur.execute(query, (id_przejazdu,))
         # Pobranie wyników
         id_pasazerow = self.cur.fetchall()
+        print(id_pasazerow)
         for a in id_pasazerow:
             lista_pasazerow.append(a[0])
         pasazerowie_pickdrop = ()
@@ -417,8 +418,8 @@ class TripPlanner:
             i.append(self.Lista_nazw_przystankow(i[1][0], ts))
         # self.Rysowanie_mapy(posortowana_niespoznionych[0][1][0], ts)
         # Zamknięcie połączenia
-        print(len(posortowana_spoznionych))
-        print(len(posortowana_niespoznionych))
+        print("Liczba spoznionych tras: ", len(posortowana_spoznionych))
+        print("Liczba NIEspoznionych tras: ", len(posortowana_niespoznionych))
         print(posortowana_niespoznionych[0])
         self.cur.close()
         self.conn.close()

@@ -42,12 +42,11 @@ export function useRealtimeChat({ roomName, username }: UseRealtimeChatProps) {
     isSettingUpRef.current = false;
   }, []);
 
-  const setupChannel = useCallback(async () => {
-    // Prevent multiple simultaneous setup attempts
-    if (isSettingUpRef.current) {
-      console.log("Channel setup already in progress...");
-      return;
-    }
+    const setupChannel = useCallback(async () => {
+      if (isSettingUpRef.current || channelRef.current) {
+        console.log("Channel already set up or being set up...");
+        return;
+      }
 
     isSettingUpRef.current = true;
 

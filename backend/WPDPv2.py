@@ -4,6 +4,7 @@ import itertools
 from collections import defaultdict
 import psycopg2
 import folium
+import math
 
 
 class TripPlanner:
@@ -75,6 +76,21 @@ class TripPlanner:
                 all_valid.append(perm)
         return all_valid
 
+    def Sprawdzanie_czy_oplaca_sie_liczyc(self, trasa_wartosci):
+        """Funkcja jako filtr, żeby nie liczyć niepotrzebnych tras, gdzie kierowca jedzie do miejsca A po czym musi
+        wracać i tym samym oddalać sie od miejsca docelowego kierowcy"""
+        start = trasa_wartosci[0]
+        koniec = trasa_wartosci[-1]
+        for i in range(len(trasa_wartosci) - 2):
+            promien = math.dist(start, koniec) + math.dist(start, koniec) / 100
+            punkt = trasa_wartosci[i+1]
+            if math.dist(start, punkt) > promien:
+                return False
+            if math.dist(koniec, punkt) > promien:
+                return False
+            start = punkt
+        return True
+
     def Liczenie_dlugosci_tras(self, trasa_slownik, pasazerowie):
         """Funkcja licząca i sortująca długość tras z kandydatami do wspólnej jazdy"""
         # Do testowania, żeby nienadłużywać openrouteservice. Sprawdza tylko jedną permutacje
@@ -84,22 +100,23 @@ class TripPlanner:
         for perm in permutacje:
             trasa = ("D_start",) + perm + ("D_end",)
             trasa_z_wartosciami = tuple(trasa_slownik[klucz] for klucz in trasa)
-            route = self.client.directions(
-                coordinates=trasa_z_wartosciami,
-                profile='driving-car',
-                format='geojson'
-            )
-            total_distance = 0
-            total_duration = 0
-            lista_czasow_trasy_przystankow = [0]
-            lista_odlegosci_trasy_przystankow = [0]
-            for segment in route['features'][0]['properties']['segments']:
-                total_distance += segment['distance'] / 1000
-                total_duration += segment['duration'] / 60
-                lista_czasow_trasy_przystankow.append(round(total_duration, 2))
-                lista_odlegosci_trasy_przystankow.append(round(total_distance, 2))
-            Dlugosci.append((trasa, round(total_distance, 2), round(total_duration), lista_odlegosci_trasy_przystankow,
-                             lista_czasow_trasy_przystankow))
+            if self.Sprawdzanie_czy_oplaca_sie_liczyc(trasa_z_wartosciami) is True:
+                route = self.client.directions(
+                    coordinates=trasa_z_wartosciami,
+                    profile='driving-car',
+                    format='geojson'
+                )
+                total_distance = 0
+                total_duration = 0
+                lista_czasow_trasy_przystankow = [0]
+                lista_odlegosci_trasy_przystankow = [0]
+                for segment in route['features'][0]['properties']['segments']:
+                    total_distance += segment['distance'] / 1000
+                    total_duration += segment['duration'] / 60
+                    lista_czasow_trasy_przystankow.append(round(total_duration, 2))
+                    lista_odlegosci_trasy_przystankow.append(round(total_distance, 2))
+                Dlugosci.append((trasa, round(total_distance, 2), round(total_duration), lista_odlegosci_trasy_przystankow,
+                                 lista_czasow_trasy_przystankow))
         return Dlugosci
 
     def Rysowanie_mapy(self, trasa, trasa_slownik):
@@ -299,6 +316,20 @@ class TripPlanner:
             czy_kazdy_zdazyl = 0
         return czy_kazdy_zdazyl
 
+    def Sprawdzanie_czy_warto_przepuscic_pasazera(self, ts, pickup, dropoff):
+        """Sprawdzanie, czy warto dodać pasazera do listy proponowanych. Jeżeli jego start i koniec podrozy jest
+        totalnie oddalone od trasy kierowcy to nie ma sensu"""
+        start = ts["D_start"]
+        koniec = ts["D_end"]
+        promien = math.dist(start, koniec) + math.dist(start, koniec) / 100
+        for i in (pickup, dropoff):
+            punkt = i
+            if math.dist(start, punkt) > promien:
+                return False
+            if math.dist(koniec, punkt) > promien:
+                return False
+        return True
+
     def Szukanie_Najlepszej_trasy(self, id_podroz):
         """Funkcja znajdywania najlepszych kandydatow do trasy dla kierowcy"""
         query = """
@@ -316,6 +347,7 @@ class TripPlanner:
             WHERE id_przejazdu IS DISTINCT FROM %s;
         """
         self.cur.execute(query, (id_przejazdu,))
+        # Mniejsza ilość kandyatów
         kandydaci_przejazdu = self.cur.fetchall()
         lista_niespoznionych = []
         lista_spoznionych = []
@@ -323,18 +355,22 @@ class TripPlanner:
         for k in kandydaci_przejazdu:
             lista_pazazerow_z_kandydatem = lista_pasazerow.copy()
             lista_pazazerow_z_kandydatem.append(k[1])
-            ts[f"{k[1]}_pickup"] = self.geocode_address(k[2])
-            ts[f"{k[1]}_dropoff"] = self.geocode_address(k[5])
-            ts[f"{k[1]}_arrival_time"] = self.time_to_decimal(k[7])
-            nowe_lp = lp + (f"{k[1]}_pickup", f"{k[1]}_dropoff")
-            plt = self.Liczenie_dlugosci_tras(ts, nowe_lp)
-            for p in plt:
-                slownik_pasazerow_km_h = self.Sprawdzanie_czasow_i_km(p, ts)
-                czy_kazdy_zdazyl = self.Sprawdzanie_cz_kazdy_zdazyl(lista_pasazerow, ts, slownik_pasazerow_km_h, p[2])
-                if czy_kazdy_zdazyl == 1:
-                    lista_niespoznionych.append([k[1], p, slownik_pasazerow_km_h])
-                else:
-                    lista_spoznionych.append([k[1], p, slownik_pasazerow_km_h])
+            pickup = self.geocode_address(k[2])
+            dropoff = self.geocode_address(k[5])
+            arrival_time = self.time_to_decimal(k[7])
+            if self.Sprawdzanie_czy_warto_przepuscic_pasazera(ts, pickup, dropoff) is True:
+                ts[f"{k[1]}_pickup"] = pickup
+                ts[f"{k[1]}_dropoff"] = dropoff
+                ts[f"{k[1]}_arrival_time"] = arrival_time
+                nowe_lp = lp + (f"{k[1]}_pickup", f"{k[1]}_dropoff")
+                plt = self.Liczenie_dlugosci_tras(ts, nowe_lp)
+                for p in plt:
+                    slownik_pasazerow_km_h = self.Sprawdzanie_czasow_i_km(p, ts)
+                    czy_kazdy_zdazyl = self.Sprawdzanie_cz_kazdy_zdazyl(lista_pasazerow, ts, slownik_pasazerow_km_h, p[2])
+                    if czy_kazdy_zdazyl == 1:
+                        lista_niespoznionych.append([k[1], p, slownik_pasazerow_km_h])
+                    else:
+                        lista_spoznionych.append([k[1], p, slownik_pasazerow_km_h])
 
         posortowana_spoznionych = sorted(lista_spoznionych, key=lambda x: x[1][1])
         posortowana_niespoznionych = sorted(lista_niespoznionych, key=lambda x: x[1][1])
@@ -378,11 +414,14 @@ class TripPlanner:
             i.append(self.Lista_nazw_przystankow(i[1][0], ts))
         # self.Rysowanie_mapy(posortowana_niespoznionych[0][1][0], ts)
         # Zamknięcie połączenia
+        print(len(posortowana_spoznionych))
+        print(len(posortowana_niespoznionych))
+        print(posortowana_niespoznionych[0])
         self.cur.close()
         self.conn.close()
         return posortowana_niespoznionych[0:3]
 
 
 if __name__ == "__main__":
-    id_podrozy = '2e380ca9-2592-47d5-a9b7-6d3506b44858'
+    id_podrozy = '51e4b875-f90c-4633-a578-5a521b9ec125'
     TripPlanner().Szukanie_Najlepszej_trasy(id_podrozy)

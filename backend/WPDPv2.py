@@ -315,20 +315,18 @@ class TripPlanner:
         # Zamiana pierwszego elementu z id na Imie i nazwisko pasazera
         for i in posortowana_niespoznionych[0:3]:
             i[0] = mapping.get(i[0], None)
+            nowy_slownik = {}
+            # Zamiana w słowniku elementu z id na Imie i nazwisko pasazera
+            for key, value in i[2].items():
+                new_key = key
+                for uid, name in mapping.items():
+                    if uid in key:
+                        new_key = key.replace(uid, name)
+                        break  # tylko pierwsze dopasowanie
+                nowy_slownik[new_key] = value
+            nowy_slownik = self.convert_godzina_dotarcia(nowy_slownik)
+            i[2] = nowy_slownik
 
-        nowy_slownik = {}
-        # Zamiana w słowniku elementu z id na Imie i nazwisko pasazera
-        for key, value in posortowana_niespoznionych[0][2].items():
-            new_key = key
-            for uid, name in mapping.items():
-                if uid in key:
-                    new_key = key.replace(uid, name)
-                    break  # tylko pierwsze dopasowanie
-            nowy_slownik[new_key] = value
-
-        nowy_slownik = self.convert_godzina_dotarcia(nowy_slownik)
-
-        posortowana_niespoznionych[0][2] = nowy_slownik
         self.Rysowanie_mapy(posortowana_niespoznionych[0][1][0], ts)
         # Zamknięcie połączenia
         self.cur.close()

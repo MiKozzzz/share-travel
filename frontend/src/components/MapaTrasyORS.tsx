@@ -65,10 +65,10 @@ export default function MapaTrasyORS({ punkty }: MapaTrasyORSProps) {
         <>
           <Polyline positions={trasa} color="blue" />
           <FitBounds bounds={trasa} />
-          {/* Dodajemy markery dla każdego punktu trasy */}
-          {trasa.map((punkt, idx) => (
+          {/* Markery dla przystanków pasażerów - czyli oryginalne punkty */}
+          {punkty.map((punkt, idx) => (
             <Marker key={idx} position={punkt}>
-              <Popup>Przystanek {idx + 1}</Popup>
+              <Popup>Przystanek pasażera {idx + 1}</Popup>
             </Marker>
           ))}
         </>

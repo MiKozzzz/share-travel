@@ -1,16 +1,20 @@
 import { ArrowLeft, MoreHorizontal } from "lucide-react";
+import { RealtimeChat } from "@/components/realtime-chat";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 const Chat: React.FC = () => {
+  const user = useAuthStore((state) => state.user);
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <div className="bg-primary text-white py-3 text-center relative">
+      {/* <div className="bg-primary text-white py-3 text-center relative">
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <div className="absolute -top-4 left-0 right-0 flex justify-center">
             <div className="h-2 w-4 border-l-2 border-r-2 border-b-2 border-white rotate-180"></div>
           </div>
         </div>
-        Następna zaplanowana wspólna podróż: dzisiaj, 7:40, ul. Sienkiewicza 12!
-      </div>
+        Następna zaplanowana wspólna podróż: dzisiaj, 7:30, ul. Sienkiewicza 12!
+      </div> */}
 
       <div className="flex-1 flex">
         <div className="w-1/3 bg-[#f5f7fa] border-r border-gray-200 p-4 flex flex-col">
@@ -38,11 +42,16 @@ const Chat: React.FC = () => {
 
         <div className="w-2/3 bg-[#f5f7fa] p-4 flex flex-col">
           <div className="mb-4">
-            <h2 className="text-[#18191f] text-lg">Ktoś tam</h2>
+            <h2 className="text-[#18191f] text-lg">Chat Room</h2>
+            <p className="text-sm text-gray-500">Logged in as: {user?.email}</p>
           </div>
 
           <div className="flex-1 space-y-4 overflow-y-auto mb-4">
-            <div className="max-w-[80%]">
+            <RealtimeChat
+              roomName="my-chat-room"
+              username={user?.email || "anonymous"}
+            />
+            {/* <div className="max-w-[80%]">
               <div className="bg-primary text-white p-4 rounded-2xl">
                 <p>
                   Nowa zaproszenie! XYZ zaprasza Cię do wspólnej podróży w
@@ -62,7 +71,7 @@ const Chat: React.FC = () => {
               Hej! Coś tam coś tam...........
             </div>
 
-            <div className="h-20"></div>
+            <div className="h-20"></div> */}
 
             <div className="bg-white rounded-full p-4 flex items-center justify-between">
               <span>Chcesz zaakceptować przejazd?</span>

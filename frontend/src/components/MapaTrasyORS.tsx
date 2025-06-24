@@ -50,18 +50,21 @@ export default function MapaTrasyORS({ punkty }: MapaTrasyORSProps) {
     : [0, 0];
 
   return (
-    <MapContainer
+    <div style={{ height: "400px", width: "100%", marginTop: "1rem" }}>
+      <MapContainer
         center={center}
         zoom={7}
         scrollWheelZoom={true}
-        style={{ height: "400px", width: "100%" }}
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution="&copy; OpenStreetMap contributors"
-      />
-      {trasa.length > 0 && <Polyline positions={trasa} color="blue" />}
-    </MapContainer>
+        style={{ height: "100%", width: "100%", borderRadius: "0.5rem", zIndex: 0 }}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution="&copy; OpenStreetMap contributors"
+        />
+        {trasa.length > 0 && <Polyline positions={trasa} color="blue" />}
+      </MapContainer>
+    </div>
   );
+
 }
 

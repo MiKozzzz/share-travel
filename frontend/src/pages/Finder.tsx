@@ -93,9 +93,9 @@ export default function Finder() {
             {odpowiedzBackendu.slice(0, 3).map((element, index) => {
               const [Imie, details, metryki, punkty_trasy] = element;
               const [, km_trasy, czas_trasy, distList, czasList] = details;
-
+              console.log("Punkty trasy:", punkty_trasy);
               const safePunktyTrasy = Array.isArray(punkty_trasy) ? punkty_trasy : [];
-
+              console.log("Punkty trasy:", safePunktyTrasy);
               return (
                 <li key={index} className="bg-white rounded shadow p-4">
                   <p><strong>Pasażer:</strong> {Imie}</p>

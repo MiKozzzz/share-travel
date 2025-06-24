@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Polyline } from "react-leaflet";
+import { MapContainer, TileLayer, Polyline, useMap } from "react-leaflet";
+import L from "leaflet";
 
 type Coordinate = [number, number]; // [lat, lng]
 
@@ -9,14 +10,24 @@ type MapaTrasyORSProps = {
 
 const API_KEY = "5b3ce3597851110001cf62481d3e0a9ee8d941fc838015801df2e5d0";
 
+function FitBounds({ bounds }: { bounds: Coordinate[] }) {
+  const map = useMap();
 
+  useEffect(() => {
+    if (bounds.length > 0) {
+      const leafletBounds = L.latLngBounds(bounds);
+      map.fitBounds(leafletBounds, { padding: [50, 50] });
+    }
+  }, [bounds]);
+
+  return null;
+}
 
 export default function MapaTrasyORS({ punkty }: MapaTrasyORSProps) {
   const [trasa, setTrasa] = useState<Coordinate[]>([]);
 
   useEffect(() => {
-    if (punkty.length < 2) return; // minimum 2 punkty
-    // Konwersja na format [lng, lat] wymagany przez ORS
+    if (punkty.length < 2) return;
     const coordsForApi = punkty.map(([lat, lng]) => [lng, lat]);
 
     fetch("https://api.openrouteservice.org/v2/directions/driving-car/geojson", {
@@ -31,40 +42,31 @@ export default function MapaTrasyORS({ punkty }: MapaTrasyORSProps) {
     })
       .then((res) => res.json())
       .then((data) => {
-        const coords = data.features[0].geometry.coordinates; // [ [lng, lat], ... ]
-        // Konwersja do [lat, lng] na potrzeby Leaflet
+        const coords = data.features[0].geometry.coordinates;
         const latLngCoords = coords.map((c: number[]) => [c[1], c[0]] as Coordinate);
         setTrasa(latLngCoords);
       })
       .catch((err) => console.error("Błąd pobierania trasy:", err));
   }, [punkty]);
 
-  // Centrum mapy na środek pierwszego i ostatniego punktu albo [0,0]
-  const center: [number, number] = trasa.length > 1
-    ? [
-        (trasa[0][0] + trasa[trasa.length - 1][0]) / 2,
-        (trasa[0][1] + trasa[trasa.length - 1][1]) / 2,
-      ]
-    : trasa.length === 1
-    ? [trasa[0][0], trasa[0][1]]
-    : [0, 0];
-
   return (
-    <div style={{ height: "400px", width: "100%", marginTop: "1rem" }}>
-      <MapContainer
-        center={center}
-        zoom={7}
-        scrollWheelZoom={true}
-        style={{ height: "100%", width: "100%", borderRadius: "0.5rem", zIndex: 0 }}
-      >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution="&copy; OpenStreetMap contributors"
-        />
-        {trasa.length > 0 && <Polyline positions={trasa} color="blue" />}
-      </MapContainer>
-    </div>
+    <MapContainer
+      center={[52, 19]} // tymczasowe centrum
+      zoom={7}
+      scrollWheelZoom={true}
+      style={{ height: "400px", width: "100%" }}
+    >
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution="&copy; OpenStreetMap contributors"
+      />
+      {trasa.length > 0 && (
+        <>
+          <Polyline positions={trasa} color="blue" />
+          <FitBounds bounds={trasa} />
+        </>
+      )}
+    </MapContainer>
   );
-
 }
 

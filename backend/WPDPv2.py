@@ -269,7 +269,7 @@ class TripPlanner:
             WHERE id_przejazdu IS DISTINCT FROM %s;
         """
         self.cur.execute(query, (id_przejazdu,))
-        kandydaci_przejazdu = self.cur.fetchall()
+        kandydaci_przejazdu = self.cur.fetchall()[:3]
         lista_niespoznionych = []
         lista_spoznionych = []
         # Lista id pasazerow, co drugie slowo przed _ z listy lp zapisuje jako pasazera

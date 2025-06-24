@@ -98,6 +98,7 @@ export default function Finder() {
                 punkty_trasy && Array.isArray(punkty_trasy.punkty_trasy)
                   ? punkty_trasy.punkty_trasy
                   : [];
+              const poprawionePunkty = safePunktyTrasy.map(([lng, lat]: [number, number]) => [lat, lng]);
               console.log("Punkty trasy:", safePunktyTrasy);
               return (
                 <li key={index} className="bg-white rounded shadow p-4">
@@ -115,7 +116,7 @@ export default function Finder() {
                   {selectedDetailsIndex === index && (
                     <div className="mt-4 bg-gray-100 p-4 rounded text-sm">
                       <h4 className="font-semibold mb-2">Zobacz trasę na mapie:</h4>
-                      <MapaTrasy punkty={safePunktyTrasy} />
+                      <MapaTrasy punkty={poprawionePunkty} />
 
                       <h4 className="font-semibold mt-4 mb-2">Długości odcinków (km):</h4>
                       <p>{JSON.stringify(distList)}</p>

@@ -328,6 +328,7 @@ class TripPlanner:
             trasa_z_wartosciami = list(list(ts[klucz]) for klucz in i[1][0])
             slownik_do_mapki = {"punkty_trasy": trasa_z_wartosciami}
             i.append(slownik_do_mapki)
+            print(slownik_do_mapki)
         self.Rysowanie_mapy(posortowana_niespoznionych[0][1][0], ts)
         # Zamknięcie połączenia
         self.cur.close()

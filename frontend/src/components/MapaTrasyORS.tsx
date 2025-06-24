@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Polyline, useMap } from "react-leaflet";
-import { Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Polyline, useMap, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
@@ -12,10 +11,15 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-type Coordinate = [number, number]; // [lat, lng]
+type Przystanek = {
+  name: string;
+  location: [number, number]; // [lat, lng]
+};
+
+type Coordinate = [number, number];
 
 type MapaTrasyORSProps = {
-  punkty: Coordinate[]; // wiele punktów trasy [lat, lng]
+  punkty: Przystanek[]; // zamiast samych współrzędnych, mamy też nazwę
 };
 
 const API_KEY = "5b3ce3597851110001cf62481d3e0a9ee8d941fc838015801df2e5d0";
@@ -38,7 +42,8 @@ export default function MapaTrasyORS({ punkty }: MapaTrasyORSProps) {
 
   useEffect(() => {
     if (punkty.length < 2) return;
-    const coordsForApi = punkty.map(([lat, lng]) => [lng, lat]);
+
+    const coordsForApi = punkty.map(p => [p.location[1], p.location[0]]);
 
     fetch("https://api.openrouteservice.org/v2/directions/driving-car/geojson", {
       method: "POST",
@@ -61,7 +66,7 @@ export default function MapaTrasyORS({ punkty }: MapaTrasyORSProps) {
 
   return (
     <MapContainer
-      center={[52, 19]} // tymczasowe centrum
+      center={[52, 19]} // domyślne centrum
       zoom={7}
       scrollWheelZoom={true}
       style={{ height: "400px", width: "100%" }}
@@ -70,14 +75,15 @@ export default function MapaTrasyORS({ punkty }: MapaTrasyORSProps) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution="&copy; OpenStreetMap contributors"
       />
+
       {trasa.length > 0 && (
         <>
           <Polyline positions={trasa} color="blue" />
           <FitBounds bounds={trasa} />
-          {/* Markery dla przystanków pasażerów - czyli oryginalne punkty */}
+          {/*  Markery z nazwami przystanków */}
           {punkty.map((punkt, idx) => (
-            <Marker key={idx} position={punkt}>
-              <Popup>Przystanek pasażera {idx + 1}</Popup>
+            <Marker key={idx} position={punkt.location}>
+              <Popup>{punkt.name}</Popup>
             </Marker>
           ))}
         </>

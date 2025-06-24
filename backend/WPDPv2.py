@@ -157,6 +157,55 @@ class TripPlanner:
         # Zapisz do pliku HTML
         m.save("static/mapa_trasy.html")
 
+    def Lista_nazw_przystankow(self, trasa, trasa_slownik):
+        """Funkcja rysująca mapę"""
+        lista = []
+        trasa_z_wartosciami = tuple(trasa_slownik[klucz] for klucz in trasa)
+        start_coords = trasa_z_wartosciami[0]  # [lat, lon]
+        # Dodaj markery (opcjonalnie)
+        tekst_markera = f'Poczatek'
+        lista.append({"nazwa": tekst_markera, "lat": start_coords[0], "lng": start_coords[1]})
+        poprzednia = trasa_z_wartosciami[0]
+        for i in range(len(trasa_z_wartosciami) - 2):
+            tekst = trasa[i + 1]
+            id, typ = tekst.split("_")
+            query = """
+                SELECT full_name
+                FROM konto_szczegoly
+                WHERE id_uzytkownika = %s;
+            """
+            # Wykonanie zapytania
+            self.cur.execute(query, (id,))
+            imie_pasazera = self.cur.fetchone()[0]
+            if poprzednia == trasa_z_wartosciami[i + 1]:
+                lista.pop()
+                if typ == "pickup":
+                    tekst_markera = tekst_markera + f', {imie_pasazera} wsiada'
+                    lista.append({"nazwa": tekst_markera, "lat": trasa_z_wartosciami[i+1][0], "lng": trasa_z_wartosciami[i+1][1]})
+                if typ == "dropoff":
+                    tekst_markera = tekst_markera + f', {imie_pasazera} wysiada'
+                    lista.append({"nazwa": tekst_markera, "lat": trasa_z_wartosciami[i+1][0], "lng": trasa_z_wartosciami[i+1][1]})
+            else:
+                if typ == "pickup":
+                    tekst_markera = f'Przystanek: {imie_pasazera} wsiada'
+                    lista.append({"nazwa": tekst_markera, "lat": trasa_z_wartosciami[i+1][0], "lng": trasa_z_wartosciami[i+1][1]})
+                if typ == "dropoff":
+                    tekst_markera = f'Przystanek: {imie_pasazera} wysiada'
+                    lista.append({"nazwa": tekst_markera, "lat": trasa_z_wartosciami[i+1][0], "lng": trasa_z_wartosciami[i+1][1]})
+            poprzednia = trasa_z_wartosciami[i + 1]
+
+        if poprzednia == trasa_z_wartosciami[-1]:
+            lista.pop()
+            tekst_markera = tekst_markera + f', Koniec'
+            lista.append(
+                {"nazwa": tekst_markera, "lat": trasa_z_wartosciami[-1][0], "lng": trasa_z_wartosciami[-1][1]})
+        else:
+            tekst_markera = f'Koniec'
+            lista.append(
+                {"nazwa": tekst_markera, "lat": trasa_z_wartosciami[-1][0], "lng": trasa_z_wartosciami[-1][1]})
+        print(lista)
+        return lista
+
     def Szykowanie(self, id_przejazdu):
         """Funkcja pobierająca dane z sql do szukania kandydatów dla kierowcy do wspólnej jazdy"""
         # Wykonujemy zapytanie
@@ -268,7 +317,7 @@ class TripPlanner:
             WHERE id_przejazdu IS DISTINCT FROM %s;
         """
         self.cur.execute(query, (id_przejazdu,))
-        kandydaci_przejazdu = self.cur.fetchall()
+        kandydaci_przejazdu = self.cur.fetchall()[:3]
         lista_niespoznionych = []
         lista_spoznionych = []
         # Lista id pasazerow, co drugie slowo przed _ z listy lp zapisuje jako pasazera
@@ -327,7 +376,7 @@ class TripPlanner:
             trasa_z_wartosciami = list(list(ts[klucz]) for klucz in i[1][0])
             slownik_do_mapki = {"punkty_trasy": trasa_z_wartosciami}
             i.append(slownik_do_mapki)
-            print(slownik_do_mapki)
+            i.append(self.Lista_nazw_przystankow(i[1][0], ts))
         # self.Rysowanie_mapy(posortowana_niespoznionych[0][1][0], ts)
         # Zamknięcie połączenia
         self.cur.close()

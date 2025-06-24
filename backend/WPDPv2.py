@@ -78,8 +78,8 @@ class TripPlanner:
     def Liczenie_dlugosci_tras(self, trasa_slownik, pasazerowie):
         """Funkcja licząca i sortująca długość tras z kandydatami do wspólnej jazdy"""
         # Do testowania, żeby nienadłużywać openrouteservice. Sprawdza tylko jedną permutacje
-        permutacje = self.valid_permutations(pasazerowie)[3:4]
-        # permutacje = valid_permutations(pasazerowie)
+        # permutacje = self.valid_permutations(pasazerowie)[3:4]
+        permutacje = self.valid_permutations(pasazerowie)
         Dlugosci = []
         for perm in permutacje:
             trasa = ("D_start",) + perm + ("D_end",)
@@ -316,7 +316,7 @@ class TripPlanner:
             WHERE id_przejazdu IS DISTINCT FROM %s;
         """
         self.cur.execute(query, (id_przejazdu,))
-        kandydaci_przejazdu = self.cur.fetchall()[:3]
+        kandydaci_przejazdu = self.cur.fetchall()
         lista_niespoznionych = []
         lista_spoznionych = []
         # Lista id pasazerow, co drugie slowo przed _ z listy lp zapisuje jako pasazera

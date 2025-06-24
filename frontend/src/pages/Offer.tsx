@@ -45,7 +45,7 @@ const Offer: React.FC = () => {
         s_o_ktorej_najwczesniej,
         id_uzytkownika: userId,
         // UWAGA TO STATYCZNE DODANIE PRZEJAZD W CELACH TESTOWYCH
-        id_przejazdu: 'f059fc62-3915-4d6f-bc9f-0e59ca2744a6'
+        id_przejazdu: 'f959fc62-3915-4d6f-bc9f-0e59ca2744a6'
       },
     ]);
 
@@ -138,7 +138,7 @@ const Offer: React.FC = () => {
             {/* d_o_ktorej_najpozniej */}
             <div className="bg-white p-6 rounded-md flex flex-col items-center">
               <button className="bg-primary text-white py-3 px-6 rounded-md w-full mb-6 hover:bg-[#3d9c3f]">
-                Podaj o której najwcześniej wstać
+                Podaj o której najwcześniej możesz wstać
               </button>
               <div className="flex items-center w-full border border-gray-300 rounded-md overflow-hidden">
                 <input

@@ -18,7 +18,7 @@ type MapaTrasyORSProps = {
   przystanki: { nazwa: string; lat: number; lng: number }[];
 };
 
-const API_KEY = "5b3ce3597851110001cf62481d3e0a9ee8d941fc838015801df2e5d0";
+const API_KEY = "5b3ce3597851110001cf62487123321cf99e47efa4a8af210b74b4d0";
 
 function FitBounds({ bounds }: { bounds: Coordinate[] }) {
   const map = useMap();

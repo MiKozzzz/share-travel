@@ -22,7 +22,7 @@ class PodrozInput(BaseModel):
 
 @app.get("/mapa-trasy", response_class=HTMLResponse)
 def get_mapa_trasy():
-    with open("static/mapa_trasy.html", "r", encoding="utf-8") as f:
+    with open("static/mapa_trasy.html ", "r", encoding="utf-8") as f:
         html = f.read()
     return HTMLResponse(content=html)
 

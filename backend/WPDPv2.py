@@ -203,7 +203,6 @@ class TripPlanner:
             tekst_markera = f'Koniec'
             lista.append(
                 {"nazwa": tekst_markera, "lat": trasa_z_wartosciami[-1][0], "lng": trasa_z_wartosciami[-1][1]})
-        print(lista)
         return lista
 
     def Szykowanie(self, id_przejazdu):

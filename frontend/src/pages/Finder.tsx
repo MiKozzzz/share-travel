@@ -92,7 +92,7 @@ export default function Finder() {
               Szukaj pasażerów
             </button>
             {odpowiedzBackendu.slice(0, 3).map((element, index) => {
-              const [Imie, details, metryki, punkty_trasy] = element;
+              const [Imie, details, metryki, punkty_trasy, nazwy_przystankow] = element;
               const [, km_trasy, czas_trasy, distList, czasList] = details;
               console.log("Punkty trasy:", punkty_trasy);
               const safePunktyTrasy =
@@ -117,8 +117,10 @@ export default function Finder() {
                   {selectedDetailsIndex === index && (
                     <div className="mt-4 bg-gray-100 p-4 rounded text-sm">
                       <h4 className="font-semibold mb-2">Zobacz trasę na mapie:</h4>
-                      <MapaTrasyORS punkty={poprawionePunkty} />
-
+                      <MapaTrasyORS 
+                        punkty_trasy={poprawionePunkty} 
+                        przystanki={nazwy_przystankow} 
+                      />
                       <h4 className="font-semibold mt-4 mb-2">Długości odcinków (km):</h4>
                       <p>{JSON.stringify(distList)}</p>
 

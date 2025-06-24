@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Polyline, useMap } from "react-leaflet";
+import { Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 
 type Coordinate = [number, number]; // [lat, lng]
@@ -64,6 +65,12 @@ export default function MapaTrasyORS({ punkty }: MapaTrasyORSProps) {
         <>
           <Polyline positions={trasa} color="blue" />
           <FitBounds bounds={trasa} />
+          {/* Dodajemy markery dla każdego punktu trasy */}
+          {trasa.map((punkt, idx) => (
+            <Marker key={idx} position={punkt}>
+              <Popup>Przystanek {idx + 1}</Popup>
+            </Marker>
+          ))}
         </>
       )}
     </MapContainer>

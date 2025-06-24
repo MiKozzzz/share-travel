@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import type { Podroz } from "../lib/podroze";
 import { fetchPodroze } from "../lib/podroze";
 import { getCurrentUserId } from "../lib/auth";
-import MapaTrasy from '../components/MapaTrasy';
+import MapaTrasy from "@/components/MapaTrasy";
+
 
 
 export default function Finder() {

@@ -89,7 +89,7 @@ export default function Finder() {
             </button>
             {odpowiedzBackendu.slice(0, 3).map((element, index) => {
               const [Imie, details, metryki] = element;
-              const [trasa, km_trasy, czas_trasy, distList, czasList] = details;
+              const [, km_trasy, czas_trasy, distList, czasList] = details;
 
               return (
                 <li key={index} className="bg-white rounded shadow p-4">
@@ -106,12 +106,16 @@ export default function Finder() {
 
                   {selectedDetailsIndex === index && (
                     <div className="mt-4 bg-gray-100 p-4 rounded text-sm">
-                      <h4 className="font-semibold mb-2">Trasa:</h4>
-                      <ul className="list-disc list-inside mb-2">
-                        {trasa.map((punkt: string, i: number) => (
-                          <li key={i}>{punkt}</li>
-                        ))}
-                      </ul>
+                      <h4 className="font-semibold mb-2">
+                        <a 
+                          href="/static/mapa_trasy.html" 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-blue-600 hover:underline"
+                        >
+                          Zobacz trasę na mapie
+                        </a>
+                      </h4>
 
                       <h4 className="font-semibold mt-4 mb-2">Długości odcinków (km):</h4>
                       <p>{JSON.stringify(distList)}</p>

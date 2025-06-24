@@ -4,6 +4,8 @@ import itertools
 from collections import defaultdict
 import psycopg2
 import folium
+import re
+
 class TripPlanner:
     def __init__(self, client_openrouteservice='5b3ce3597851110001cf624844376cc89897404181958bd72c55e233',
                  host="aws-0-eu-central-1.pooler.supabase.com", port=6543, database="postgres",
@@ -26,6 +28,22 @@ class TripPlanner:
         hours, minutes = map(int, time_str.split(":"))
         decimal_time = hours + minutes / 60
         return round(decimal_time, 2)
+
+    def convert_godzina_dotarcia(self, slowownik):
+        wynik = {}
+        for key, val in slowownik.items():
+            if "Godzina dotarcia" in key:
+                wynik[key] = self.decimal_to_time(val)
+            else:
+                wynik[key] = val
+        return wynik
+
+    def decimal_to_time(self, decimal_time):
+        """Konwertuje liczbę dziesiętną na czas w formacie 'HH:MM'."""
+        hours = int(decimal_time)
+        minutes = round((decimal_time - hours) * 60)
+        # Dodaj zero z przodu, jeśli minuty < 10, dla formatu 2-cyfrowego
+        return f"{hours:02d}:{minutes:02d}"
 
     def geocode_address(self, address):
         """Zamienia adres tekstowy na współrzędne [lon, lat]"""
@@ -140,8 +158,7 @@ class TripPlanner:
         else:
             folium.Marker(location=trasa_z_wartosciami[-1][::-1], tooltip='Koniec').add_to(m)
         # Zapisz do pliku HTML
-        print(m)
-        m.save("trasa.html")
+        m.save("static/mapa_trasy.html")
 
     def Szykowanie(self, id_przejazdu):
         """Funkcja pobierająca dane z sql do szukania kandydatów dla kierowcy do wspólnej jazdy"""
@@ -210,25 +227,26 @@ class TripPlanner:
             if punkt.endswith('_pickup'):
                 ident = punkt.replace('_pickup', '')
                 lista_obecnych_osob_w_aucie.append(ident)
-                ns[f"{ident}_travel_distance"] = lista_km[i]
-                ns[f"{ident}_travel_time"] = lista_czasow[i]
-                ns[f"{ident}_arrival_time"] = 0
+                ns[f"Przejechane kilometry {ident}"] = lista_km[i]
+                ns[f"Przejechany czas {ident} (w minutach)"] = lista_czasow[i]
+                ns[f"Godzina dotarcia {ident} do miejsca docelowego"] = 0
             elif punkt.endswith('_dropoff'):
                 ident = punkt.replace('_dropoff', '')
                 lista_obecnych_osob_w_aucie.remove(ident)
-                ns[f"{ident}_travel_time"] = round(abs(ns[f"{ident}_travel_time"] - lista_czasow[i]), 2)
-                ns[f"{ident}_travel_distance"] = round(abs(ns[f"{ident}_travel_distance"] - lista_km[i]), 2)
+                ns[f"Przejechany czas {ident} (w minutach)"] = round(abs(ns[f"Przejechany czas {ident} (w minutach)"] - lista_czasow[i]), 2)
+                ns[f"Przejechane kilometry {ident}"] = round(abs(ns[f"Przejechane kilometry {ident}"] - lista_km[i]), 2)
                 # Godzina o której będzie pasażer, jeśli kierowca wyruszy o swojej min godzinie start
-                ns[f"{ident}_arrival_time"] = round(lista_czasow[i] / 60 + ts["D_departure"], 2)
+                ns[f"Godzina dotarcia {ident} do miejsca docelowego"] = round(lista_czasow[i] / 60 + ts["D_departure"], 2)
         return ns
 
 
     def Sprawdzanie_cz_kazdy_zdazyl(self, lp, ts, ns, time_travel):
         """Funkcja, sprawdza, czy każda z osób zdążyła"""
         czy_kazdy_zdazyl = 1
-        if ts["D_departure"] + time_travel / 60 < ts["D_arrival"]:
+        ns[f"Godzina dotarcia kierowcy do miejsca docelowego"] = round(ts["D_departure"] + time_travel / 60, 2)
+        if ns[f"Godzina dotarcia kierowcy do miejsca docelowego"] < ts["D_arrival"]:
             for pas in lp:
-                if ns[f"{pas}_arrival_time"] > ts[f"{pas}_arrival_time"]:
+                if ns[f"Godzina dotarcia {pas} do miejsca docelowego"] > ts[f"{pas}_arrival_time"]:
                     czy_kazdy_zdazyl = 0
         else:
             czy_kazdy_zdazyl = 0
@@ -282,21 +300,37 @@ class TripPlanner:
         if posortowana_spoznionych:
             print("Spoznione:")
             # print(posortowana_spoznionych[0])
+        """Szykowanie danych pod wysyłke na stronę"""
+        query = """
+                SELECT id_uzytkownika, full_name
+                FROM konto_szczegoly
 
+            """
+        # Wykonanie zapytania
+        self.cur.execute(query,)
+        # Pobranie wyników
+        imiona_z_id = self.cur.fetchall()
+        # Słownik imion z id
+        mapping = dict(imiona_z_id)
+        # Zamiana pierwszego elementu z id na Imie i nazwisko pasazera
         for i in posortowana_niespoznionych[0:3]:
-            # Zamknięcie połączenia
-            query = """
-                    SELECT full_name
-                    FROM konto_szczegoly
-                    WHERE id_uzytkownika = %s;
-                """
-            # Wykonanie zapytania
-            self.cur.execute(query, (i[0],))
-            # Pobranie wyników
-            osoba = self.cur.fetchone()[0]
-            i[0] = osoba
+            i[0] = mapping.get(i[0], None)
 
+        nowy_slownik = {}
+        # Zamiana w słowniku elementu z id na Imie i nazwisko pasazera
+        for key, value in posortowana_niespoznionych[0][2].items():
+            new_key = key
+            for uid, name in mapping.items():
+                if uid in key:
+                    new_key = key.replace(uid, name)
+                    break  # tylko pierwsze dopasowanie
+            nowy_slownik[new_key] = value
+
+        nowy_slownik = self.convert_godzina_dotarcia(nowy_slownik)
+
+        posortowana_niespoznionych[0][2] = nowy_slownik
         self.Rysowanie_mapy(posortowana_niespoznionych[0][1][0], ts)
+        # Zamknięcie połączenia
         self.cur.close()
         self.conn.close()
         return posortowana_niespoznionych[0:3]

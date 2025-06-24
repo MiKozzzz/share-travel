@@ -75,7 +75,7 @@ export default function MapaTrasyORS({ punkty_trasy, przystanki }: MapaTrasyORSP
       )}
 
       {przystanki.map((p, idx) => (
-        <Marker key={idx} position={[p.lat, p.lng]}>
+        <Marker key={idx} position={[p.lng, p.lat]}>
           <Popup>{p.nazwa}</Popup>
         </Marker>
       ))}

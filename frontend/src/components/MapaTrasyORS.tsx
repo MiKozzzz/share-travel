@@ -7,7 +7,7 @@ type MapaTrasyORSProps = {
   punkty: Coordinate[]; // wiele punktów trasy [lat, lng]
 };
 
-const API_KEY = "5b3ce3597851110001cf624844376cc89897404181958bd72c55e233";
+const API_KEY = "5b3ce3597851110001cf62481d3e0a9ee8d941fc838015801df2e5d0";
 
 
 
@@ -50,7 +50,12 @@ export default function MapaTrasyORS({ punkty }: MapaTrasyORSProps) {
     : [0, 0];
 
   return (
-    <MapContainer center={center} zoom={7} style={{ height: "400px", width: "100%" }}>
+    <MapContainer
+        center={center}
+        zoom={7}
+        scrollWheelZoom={true}
+        style={{ height: "400px", width: "100%" }}
+    >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution="&copy; OpenStreetMap contributors"

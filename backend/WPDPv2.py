@@ -8,7 +8,7 @@ import re
 
 
 class TripPlanner:
-    def __init__(self, client_openrouteservice='5b3ce3597851110001cf624844376cc89897404181958bd72c55e233',
+    def __init__(self, client_openrouteservice='5b3ce3597851110001cf62481d3e0a9ee8d941fc838015801df2e5d0',
                  host="aws-0-eu-central-1.pooler.supabase.com", port=6543, database="postgres",
                  user="postgres.kxlsznvtipfyhhnilxuj", password="hY2bEwbOwqDgNHFM"):
         # Dane do openrouteservice

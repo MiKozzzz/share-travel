@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import type { Podroz } from "../lib/podroze";
 import { fetchPodroze } from "../lib/podroze";
 import { getCurrentUserId } from "../lib/auth";
-import MapaTrasy from "@/components/MapaTrasy";
+// import MapaTrasy from "@/components/MapaTrasy";
+import MapaTrasyORS from "@/components/MapaTrasyORS";
 
 
 
@@ -116,7 +117,7 @@ export default function Finder() {
                   {selectedDetailsIndex === index && (
                     <div className="mt-4 bg-gray-100 p-4 rounded text-sm">
                       <h4 className="font-semibold mb-2">Zobacz trasę na mapie:</h4>
-                      <MapaTrasy punkty={poprawionePunkty} />
+                      <MapaTrasyORS punkty={poprawionePunkty} />
 
                       <h4 className="font-semibold mt-4 mb-2">Długości odcinków (km):</h4>
                       <p>{JSON.stringify(distList)}</p>

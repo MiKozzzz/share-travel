@@ -316,18 +316,21 @@ class TripPlanner:
             czy_kazdy_zdazyl = 0
         return czy_kazdy_zdazyl
 
-    def Sprawdzanie_czy_warto_przepuscic_pasazera(self, ts, pickup, dropoff):
+    def Sprawdzanie_czy_warto_przepuscic_pasazera(self, ts, pickup, dropoff, arrival_time):
         """Sprawdzanie, czy warto dodać pasazera do listy proponowanych. Jeżeli jego start i koniec podrozy jest
         totalnie oddalone od trasy kierowcy to nie ma sensu"""
-        start = ts["D_start"]
-        koniec = ts["D_end"]
-        promien = math.dist(start, koniec) + math.dist(start, koniec) / 100
-        for i in (pickup, dropoff):
-            punkt = i
-            if math.dist(start, punkt) > promien:
-                return False
-            if math.dist(koniec, punkt) > promien:
-                return False
+        if arrival_time > ts["D_departure"]:
+            start = ts["D_start"]
+            koniec = ts["D_end"]
+            promien = math.dist(start, koniec) + math.dist(start, koniec) / 100
+            for i in (pickup, dropoff):
+                punkt = i
+                if math.dist(start, punkt) > promien:
+                    return False
+                if math.dist(koniec, punkt) > promien:
+                    return False
+        else:
+            return False
         return True
 
     def Szukanie_Najlepszej_trasy(self, id_podroz):
@@ -358,7 +361,7 @@ class TripPlanner:
             pickup = self.geocode_address(k[2])
             dropoff = self.geocode_address(k[5])
             arrival_time = self.time_to_decimal(k[7])
-            if self.Sprawdzanie_czy_warto_przepuscic_pasazera(ts, pickup, dropoff) is True:
+            if self.Sprawdzanie_czy_warto_przepuscic_pasazera(ts, pickup, dropoff, arrival_time) is True:
                 ts[f"{k[1]}_pickup"] = pickup
                 ts[f"{k[1]}_dropoff"] = dropoff
                 ts[f"{k[1]}_arrival_time"] = arrival_time

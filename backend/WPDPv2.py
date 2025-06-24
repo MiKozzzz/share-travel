@@ -4,7 +4,6 @@ import itertools
 from collections import defaultdict
 import psycopg2
 import folium
-import re
 
 
 class TripPlanner:
@@ -269,7 +268,7 @@ class TripPlanner:
             WHERE id_przejazdu IS DISTINCT FROM %s;
         """
         self.cur.execute(query, (id_przejazdu,))
-        kandydaci_przejazdu = self.cur.fetchall()[:3]
+        kandydaci_przejazdu = self.cur.fetchall()
         lista_niespoznionych = []
         lista_spoznionych = []
         # Lista id pasazerow, co drugie slowo przed _ z listy lp zapisuje jako pasazera
@@ -329,7 +328,7 @@ class TripPlanner:
             slownik_do_mapki = {"punkty_trasy": trasa_z_wartosciami}
             i.append(slownik_do_mapki)
             print(slownik_do_mapki)
-        self.Rysowanie_mapy(posortowana_niespoznionych[0][1][0], ts)
+        # self.Rysowanie_mapy(posortowana_niespoznionych[0][1][0], ts)
         # Zamknięcie połączenia
         self.cur.close()
         self.conn.close()

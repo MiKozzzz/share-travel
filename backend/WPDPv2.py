@@ -384,5 +384,5 @@ class TripPlanner:
 
 
 if __name__ == "__main__":
-    id_podrozy = '51e4b875-f90c-4633-a578-5a521b9ec125'
+    id_podrozy = '2e380ca9-2592-47d5-a9b7-6d3506b44858'
     TripPlanner().Szukanie_Najlepszej_trasy(id_podrozy)

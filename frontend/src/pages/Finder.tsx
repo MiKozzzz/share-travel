@@ -56,7 +56,7 @@ export default function Finder() {
                 }`}
                 onClick={() => setSelectedId(p.id_podrozy)}
               >
-                <strong>Z:</strong> {p.skad} <strong>do</strong> {p.dokad}
+                <strong>Z:</strong> {p.skad} <strong>do:</strong> {p.dokad}
               </li>
             ))}
           </ul>

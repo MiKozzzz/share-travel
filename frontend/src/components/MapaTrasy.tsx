@@ -1,28 +1,25 @@
-import { MapContainer, TileLayer, Polyline, Marker } from "react-leaflet";
+import { MapContainer, TileLayer, Polyline } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import type { LatLngExpression } from "leaflet";
 
 type Props = {
-  punkty: LatLngExpression[];
+  punkty: [number, number][]; // tablica par współrzędnych [lat, lng]
 };
 
 export default function MapaTrasy({ punkty }: Props) {
-  if (punkty.length === 0) return <p>Brak danych trasy.</p>;
+  if (!punkty || punkty.length < 2) {
+    return <p className="text-gray-600">Brak danych trasy.</p>;
+  }
+
+  const center = punkty[0];
 
   return (
-    <MapContainer
-      center={punkty[0]}
-      zoom={7}
-      scrollWheelZoom={true}
-      style={{ height: "400px", width: "100%" }}
-    >
+    <MapContainer center={center} zoom={6} style={{ height: "300px", width: "100%" }}>
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution="&copy; OpenStreetMap contributors"
+        attribution="© OpenStreetMap"
       />
       <Polyline positions={punkty} color="blue" />
-      <Marker position={punkty[0]} />
-      <Marker position={punkty[punkty.length - 1]} />
     </MapContainer>
   );
 }
+

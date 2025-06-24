@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import type { Podroz } from "../lib/podroze";
 import { fetchPodroze } from "../lib/podroze";
 import { getCurrentUserId } from "../lib/auth";
+import MapaTrasy from '../components/MapaTrasy';
+
 
 export default function Finder() {
   const [userId, setUserId] = useState<string | null>(null);
@@ -88,8 +90,10 @@ export default function Finder() {
               Szukaj pasażerów
             </button>
             {odpowiedzBackendu.slice(0, 3).map((element, index) => {
-              const [Imie, details, metryki] = element;
+              const [Imie, details, metryki, punkty_trasy] = element;
               const [, km_trasy, czas_trasy, distList, czasList] = details;
+
+              const safePunktyTrasy = Array.isArray(punkty_trasy) ? punkty_trasy : [];
 
               return (
                 <li key={index} className="bg-white rounded shadow p-4">
@@ -106,16 +110,8 @@ export default function Finder() {
 
                   {selectedDetailsIndex === index && (
                     <div className="mt-4 bg-gray-100 p-4 rounded text-sm">
-                      <h4 className="font-semibold mb-2">
-                        <a 
-                          href="/static/mapa_trasy.html" 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="text-blue-600 hover:underline"
-                        >
-                          Zobacz trasę na mapie
-                        </a>
-                      </h4>
+                      <h4 className="font-semibold mb-2">Zobacz trasę na mapie:</h4>
+                      <MapaTrasy punkty={safePunktyTrasy} />
 
                       <h4 className="font-semibold mt-4 mb-2">Długości odcinków (km):</h4>
                       <p>{JSON.stringify(distList)}</p>

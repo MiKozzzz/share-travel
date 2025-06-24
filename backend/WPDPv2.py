@@ -6,6 +6,7 @@ import psycopg2
 import folium
 import re
 
+
 class TripPlanner:
     def __init__(self, client_openrouteservice='5b3ce3597851110001cf624844376cc89897404181958bd72c55e233',
                  host="aws-0-eu-central-1.pooler.supabase.com", port=6543, database="postgres",
@@ -67,7 +68,6 @@ class TripPlanner:
                     return False
         return True
 
-
     def valid_permutations(self, events):
         """Zwraca permutacje z poprawną kolejnością pickup -> dropoff dla każdego identyfikatora."""
         all_valid = []
@@ -75,7 +75,6 @@ class TripPlanner:
             if self.is_valid_order(perm):
                 all_valid.append(perm)
         return all_valid
-
 
     def Liczenie_dlugosci_tras(self, trasa_slownik, pasazerowie):
         """Funkcja licząca i sortująca długość tras z kandydatami do wspólnej jazdy"""
@@ -104,7 +103,6 @@ class TripPlanner:
                              lista_czasow_trasy_przystankow))
         return Dlugosci
 
-
     def Rysowanie_mapy(self, trasa, trasa_slownik):
         """Funkcja rysująca mapę"""
         trasa_z_wartosciami = tuple(trasa_slownik[klucz] for klucz in trasa)
@@ -122,7 +120,7 @@ class TripPlanner:
         folium.Marker(location=trasa_z_wartosciami[0][::-1], tooltip=tekst_markera).add_to(m)
         poprzednia = trasa_z_wartosciami[0][::-1]
         for i in range(len(trasa_z_wartosciami) - 2):
-            tekst = trasa[i+1]
+            tekst = trasa[i + 1]
             id, typ = tekst.split("_")
             query = """
                 SELECT full_name
@@ -150,7 +148,7 @@ class TripPlanner:
                     tekst_markera = f'Przystanek: {imie_pasazera} wysiada'
                     folium.Marker(location=trasa_z_wartosciami[i + 1][::-1],
                                   tooltip=tekst_markera).add_to(m)
-            poprzednia = trasa_z_wartosciami[i+1][::-1]
+            poprzednia = trasa_z_wartosciami[i + 1][::-1]
 
         if poprzednia == trasa_z_wartosciami[-1][::-1]:
             tekst_markera = tekst_markera + f', Koniec'
@@ -181,8 +179,10 @@ class TripPlanner:
         self.cur.execute(query, (id_kierowcy, id_przejazdu))
         # Pobranie wyników
         dane_kierowcy = self.cur.fetchone()
-        trasa_slownik = {"D_start": self.geocode_address(dane_kierowcy[2]), "D_end": self.geocode_address(dane_kierowcy[5]),
-                         "D_arrival": self.time_to_decimal(dane_kierowcy[7]), "D_departure": self.time_to_decimal(dane_kierowcy[3])}
+        trasa_slownik = {"D_start": self.geocode_address(dane_kierowcy[2]),
+                         "D_end": self.geocode_address(dane_kierowcy[5]),
+                         "D_arrival": self.time_to_decimal(dane_kierowcy[7]),
+                         "D_departure": self.time_to_decimal(dane_kierowcy[3])}
         lista_pasazerow = []
         query = """
             SELECT id_uzytkownika
@@ -213,7 +213,6 @@ class TripPlanner:
             pasazerowie_pickdrop = pasazerowie_pickdrop + (f"{p}_pickup", f"{p}_dropoff")
         return trasa_slownik, pasazerowie_pickdrop, lista_pasazerow
 
-
     def Sprawdzanie_czasow_i_km(self, lista_plt, ts):
         """Funkcja sprawdza ile każdy pasażer przejechał czasu i kilometrów"""
         # Sprawdzanie kierowcy
@@ -233,12 +232,13 @@ class TripPlanner:
             elif punkt.endswith('_dropoff'):
                 ident = punkt.replace('_dropoff', '')
                 lista_obecnych_osob_w_aucie.remove(ident)
-                ns[f"Przejechany czas {ident} (w minutach)"] = round(abs(ns[f"Przejechany czas {ident} (w minutach)"] - lista_czasow[i]), 2)
+                ns[f"Przejechany czas {ident} (w minutach)"] = round(
+                    abs(ns[f"Przejechany czas {ident} (w minutach)"] - lista_czasow[i]), 2)
                 ns[f"Przejechane kilometry {ident}"] = round(abs(ns[f"Przejechane kilometry {ident}"] - lista_km[i]), 2)
                 # Godzina o której będzie pasażer, jeśli kierowca wyruszy o swojej min godzinie start
-                ns[f"Godzina dotarcia {ident} do miejsca docelowego"] = round(lista_czasow[i] / 60 + ts["D_departure"], 2)
+                ns[f"Godzina dotarcia {ident} do miejsca docelowego"] = round(lista_czasow[i] / 60 + ts["D_departure"],
+                                                                              2)
         return ns
-
 
     def Sprawdzanie_cz_kazdy_zdazyl(self, lp, ts, ns, time_travel):
         """Funkcja, sprawdza, czy każda z osób zdążyła"""
@@ -251,7 +251,6 @@ class TripPlanner:
         else:
             czy_kazdy_zdazyl = 0
         return czy_kazdy_zdazyl
-
 
     def Szukanie_Najlepszej_trasy(self, id_podroz):
         """Funkcja znajdywania najlepszych kandydatow do trasy dla kierowcy"""
@@ -307,7 +306,7 @@ class TripPlanner:
 
             """
         # Wykonanie zapytania
-        self.cur.execute(query,)
+        self.cur.execute(query, )
         # Pobranie wyników
         imiona_z_id = self.cur.fetchall()
         # Słownik imion z id
@@ -326,7 +325,9 @@ class TripPlanner:
                 nowy_slownik[new_key] = value
             nowy_slownik = self.convert_godzina_dotarcia(nowy_slownik)
             i[2] = nowy_slownik
-
+            trasa_z_wartosciami = list(list(ts[klucz]) for klucz in i[1][0])
+            slownik_do_mapki = {"punkty_trasy": trasa_z_wartosciami}
+            i.append(slownik_do_mapki)
         self.Rysowanie_mapy(posortowana_niespoznionych[0][1][0], ts)
         # Zamknięcie połączenia
         self.cur.close()
@@ -337,4 +338,3 @@ class TripPlanner:
 if __name__ == "__main__":
     id_podrozy = '51e4b875-f90c-4633-a578-5a521b9ec125'
     TripPlanner().Szukanie_Najlepszej_trasy(id_podrozy)
-

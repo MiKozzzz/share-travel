@@ -1,0 +1,108 @@
+ShareTravel
+
+Projekt realizowany w ramach kursu "Zespołowe przedsięwzięcie inżynierskie - Projekt" na Politechnice Wrocławskiej w metodyce Scrum.
+
+📌 Opis
+
+ShareTravel to aplikacja webowa umożliwiająca użytkownikom:
+
+Rejestrację i logowanie.
+
+Dodawanie własnych tras przejazdu (początek, koniec, kiedy).
+
+Przeglądanie dostępnych podróży.
+
+Wyszukiwanie najlepszego dopasowania: algorytm analizuje trasy podróżujących i dobiera tych pasażerów, których trasy najbardziej się pokrywają. Wynikiem jest lista dopasowań wraz z metrykami (dystans, czas, kolejność przystanków).
+
+⚙️ Technologie
+
+Frontend: React + TypeScript + Vite
+
+Hosting Frontend: Vercel
+
+Backend:
+
+FastAPI (Python)
+
+Supabase (baza danych PostgreSQL + realtime)
+
+Algorytm dopasowania: Python z wykorzystaniem bibliotek:
+
+openrouteservice (routing)
+
+numpy (operacje numeryczne)
+
+itertools, collections (analiza kombinacji i agregacja)
+
+psycopg2 (połączenie z bazą PostgreSQL)
+
+folium (wizualizacja trasy)
+
+Middleware: CORS (fastapi.middleware.cors.CORSMiddleware)
+
+Modele danych: pydantic
+
+🚀 Uruchomienie projektu lokalnie
+
+🔧 Wymagania
+
+Node.js >= 18
+
+Python >= 3.10
+
+Supabase (konto i projekt)
+
+Klient psql lub dostęp do Supabase Dashboard
+
+📥 Instalacja
+
+Sklonuj repozytorium:
+   git clone https://github.com/MiKozzzz/share-travel.git
+   cd share-travel
+Frontend:
+
+cd frontend
+npm install
+cp .env.example .env.local    # uzupełnij zmienne
+npm run dev
+
+Backend + Algorytm:
+
+cd ../backend
+python -m venv venv
+source venv/bin/activate      # Linux/macOS
+# venv\Scripts\activate     # Windows
+pip install -r requirements.txt
+cp .env.example .env          # uzupełnij zmienne Supabase i DB
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+Aplikacje:
+
+Frontend: http://localhost:3000
+
+Backend API: http://localhost:8000
+
+🗃️ Struktura katalogów
+ShareTravel/
+├── backend/
+│   ├── main.py              # Serwer FastAPI
+│   └── WPDPv2.py            # Algorytm dopasowania tras
+├── frontend/
+│   ├── public/              # Statyczne pliki (logo, mapa HTML)
+│   ├── src/
+│   │   ├── layout/          # Layout aplikacji (Header, Footer, Main)
+│   │   ├── pages/           # Widoki aplikacji (np. Chat, Finder, Planner)
+│   │   ├── lib/             # Moduły komunikacji z API i logiki (np. auth.ts, supabase.ts)
+│   │   ├── providers/       # Provider autoryzacji
+│   │   ├── router/          # Routing aplikacji
+│   │   ├── stores/          # Store do zarządzania stanem
+│   │   └── types/           # Typy TypeScript
+│   ├── package.json         # Konfiguracja NPM
+│   └── vite.config.ts       # Konfiguracja bundlera Vite
+└── README.md               # ten plik
+
+Algorytm dopasowania tras w Pythonie (openrouteservice, numpy, itertools), FastAPI
+
+📄 Licencja
+
+Projekt edukacyjny – brak licencji komercyjnej.

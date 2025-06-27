@@ -108,6 +108,6 @@ Backend API: http://localhost:8000
 
 Algorytm dopasowania tras w Pythonie (openrouteservice, numpy, itertools), FastAPI
 
-📄 Licencja
+## 📄 Licencja
 
 Projekt edukacyjny – brak licencji komercyjnej.

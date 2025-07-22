@@ -5,6 +5,10 @@ from WPDPv2 import *
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 
+
+"""
+uvicorn main:app --reload
+"""
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")

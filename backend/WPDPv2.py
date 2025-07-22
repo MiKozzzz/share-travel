@@ -82,7 +82,7 @@ class TripPlanner:
         start = trasa_wartosci[0]
         koniec = trasa_wartosci[-1]
         for i in range(len(trasa_wartosci) - 2):
-            promien = math.dist(start, koniec) + math.dist(start, koniec) / 100
+            promien = math.dist(start, koniec) * 1.25
             punkt = trasa_wartosci[i+1]
             if math.dist(start, punkt) > promien:
                 return False
@@ -230,7 +230,6 @@ class TripPlanner:
             FROM zaplanowane_przejazdy
             WHERE id_przejazdu = %s;
         """
-        # Wykonanie zapytania
         self.cur.execute(query, (id_przejazdu,))
         # Pobranie wyników
         id_kierowcy = self.cur.fetchone()
@@ -323,16 +322,17 @@ class TripPlanner:
         if arrival_time > ts["D_departure"]:
             start = ts["D_start"]
             koniec = ts["D_end"]
-            promien = math.dist(start, koniec) + math.dist(start, koniec) / 100
+            # Promien zwiekszony o 25%
+            promien = math.dist(start, koniec) * 1.25
             for i in (pickup, dropoff):
                 punkt = i
                 if math.dist(start, punkt) > promien:
                     return False
                 if math.dist(koniec, punkt) > promien:
                     return False
+            return True
         else:
             return False
-        return True
 
     def Szukanie_Najlepszej_trasy(self, id_podroz):
         """Funkcja znajdywania najlepszych kandydatow do trasy dla kierowcy"""
@@ -378,14 +378,7 @@ class TripPlanner:
 
         posortowana_spoznionych = sorted(lista_spoznionych, key=lambda x: x[1][1])
         posortowana_niespoznionych = sorted(lista_niespoznionych, key=lambda x: x[1][1])
-        if posortowana_niespoznionych:
-            print("Niespoznione:")
-            # print(posortowana_niespoznionych[0])
-            # print(posortowana_niespoznionych[1])
-            # print(posortowana_niespoznionych[2])
-        if posortowana_spoznionych:
-            print("Spoznione:")
-            # print(posortowana_spoznionych[0])
+
         """Szykowanie danych pod wysyłke na stronę"""
         query = """
                 SELECT id_uzytkownika, full_name
@@ -420,7 +413,8 @@ class TripPlanner:
         # Zamknięcie połączenia
         print("Liczba spoznionych tras: ", len(posortowana_spoznionych))
         print("Liczba NIEspoznionych tras: ", len(posortowana_niespoznionych))
-        print(posortowana_niespoznionych[0])
+        if posortowana_niespoznionych:
+            print(posortowana_niespoznionych[0])
         self.cur.close()
         self.conn.close()
         return posortowana_niespoznionych[0:3]

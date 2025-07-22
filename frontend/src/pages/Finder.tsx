@@ -12,6 +12,7 @@ export default function Finder() {
   const [podroze, setPodroze] = useState<Podroz[]>([]);
   const [loading, setLoading] = useState(true);
   const [szukanie, setSzukanie] = useState(false);
+  const [czySzukano, setCzySzukano] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [odpowiedzBackendu, setOdpowiedzBackendu] = useState<any[]>([]);
   const [selectedDetailsIndex, setSelectedDetailsIndex] = useState<number | null>(null);
@@ -67,6 +68,7 @@ export default function Finder() {
           <div className="mt-8 text-center">
             <button
                 onClick={async () => {
+                  setCzySzukano(true);
                   if (selectedId) {
                     const wybrana = podroze.find((p) => p.id_podrozy === selectedId);
                     alert(`Wybrano podróż: ${wybrana?.skad} → ${wybrana?.dokad}`);
@@ -99,7 +101,7 @@ export default function Finder() {
               Szukaj pasażerów
             </button>
             {szukanie && (<p className="text-center my-4 text-gray-600">⏳ Szukanie pasażerów...</p>)}
-            {!szukanie && odpowiedzBackendu.length === 0 && (
+            {czySzukano && !szukanie && odpowiedzBackendu.length === 0 && (
               <p className="text-center my-4 text-gray-600">🔍 Brak pasujących pasażerów.</p>
             )}
             {!szukanie && odpowiedzBackendu.length > 0 && odpowiedzBackendu.slice(0, 3).map((element, index) => {

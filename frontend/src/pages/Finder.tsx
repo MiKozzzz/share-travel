@@ -99,7 +99,10 @@ export default function Finder() {
               Szukaj pasażerów
             </button>
             {szukanie && (<p className="text-center my-4 text-gray-600">⏳ Szukanie pasażerów...</p>)}
-            {odpowiedzBackendu.slice(0, 3).map((element, index) => {
+            {!szukanie && odpowiedzBackendu.length === 0 && (
+              <p className="text-center my-4 text-gray-600">🔍 Brak pasujących pasażerów.</p>
+            )}
+            {!szukanie && odpowiedzBackendu.length > 0 && odpowiedzBackendu.slice(0, 3).map((element, index) => {
               const [Imie, details, metryki, punkty_trasy, nazwy_przystankow] = element;
               const [, km_trasy, czas_trasy, distList, czasList] = details;
               console.log("Punkty trasy:", punkty_trasy);

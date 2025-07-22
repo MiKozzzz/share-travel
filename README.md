@@ -1,7 +1,7 @@
 # ShareTravel
 
 
-Projekt realizowany w ramach kursu "Zespołowe przedsięwzięcie inżynierskie - Projekt" na Politechnice Wrocławskiej w metodyce Scrum.
+Projekt realizowany w ramach kursu na Politechnice Wrocławskiej.
 
 Link: share-travel-git-main-mikozzzzs-projects.vercel.app
 

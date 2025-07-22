@@ -11,6 +11,7 @@ export default function Finder() {
   const [userId, setUserId] = useState<string | null>(null);
   const [podroze, setPodroze] = useState<Podroz[]>([]);
   const [loading, setLoading] = useState(true);
+  const [szukanie, setSzukanie] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [odpowiedzBackendu, setOdpowiedzBackendu] = useState<any[]>([]);
   const [selectedDetailsIndex, setSelectedDetailsIndex] = useState<number | null>(null);
@@ -65,32 +66,39 @@ export default function Finder() {
           {/* Przycisk szukania */}
           <div className="mt-8 text-center">
             <button
-              onClick={async () => {
-                if (selectedId) {
-                  const wybrana = podroze.find((p) => p.id_podrozy === selectedId);
-                  alert(`Wybrano podróż: ${wybrana?.skad} → ${wybrana?.dokad}`);
-                  // Tutaj wywołujesz backend:
-                  fetch("http://127.0.0.1:8000/wybierz-podroz", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ id_podrozy: selectedId }),
-                  })
-                    .then(res => res.json())
-                    .then(data => {
+                onClick={async () => {
+                  if (selectedId) {
+                    const wybrana = podroze.find((p) => p.id_podrozy === selectedId);
+                    alert(`Wybrano podróż: ${wybrana?.skad} → ${wybrana?.dokad}`);
+
+                    setSzukanie(true); // start ładowania
+                    try {
+                      const res = await fetch("http://127.0.0.1:8000/wybierz-podroz", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ id_podrozy: selectedId }),
+                      });
+
+                      const data = await res.json();
                       console.log("Odpowiedź backendu:", data);
-                      setOdpowiedzBackendu(data); // <-- zapisz dane do stanu                   
-                    })
-                    .catch(err => console.error("Błąd fetch:", err));
-                } else {
-                  alert("Wybierz podróż przed kontynuacją.");
-                }
-              }}
+                      setOdpowiedzBackendu(data);
+                    } catch (err) {
+                      console.error("Błąd fetch:", err);
+                    } finally {
+                      setSzukanie(false); // koniec ładowania
+                    }
+                  } else {
+                    alert("Wybierz podróż przed kontynuacją.");
+                  }
+                }}
+
               className="bg-green-600 text-white py-3 px-8 rounded-lg hover:bg-green-700"
             >
               Szukaj pasażerów
             </button>
+            {szukanie && (<p className="text-center my-4 text-gray-600">⏳ Szukanie pasażerów...</p>)}
             {odpowiedzBackendu.slice(0, 3).map((element, index) => {
               const [Imie, details, metryki, punkty_trasy, nazwy_przystankow] = element;
               const [, km_trasy, czas_trasy, distList, czasList] = details;

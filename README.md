@@ -3,7 +3,7 @@
 
 Projekt realizowany w ramach kursu na Politechnice Wrocławskiej.
 
-Link: share-travel-git-main-mikozzzzs-projects.vercel.app
+[Link do strony](share-travel-git-main-mikozzzzs-projects.vercel.app)
 
 ## 📌 Opis
 
